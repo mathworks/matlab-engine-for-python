@@ -20,10 +20,10 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2019b'
+    MATLAB_REL = 'R2020a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.7' 
+    MATLAB_VER = '9.8' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7'])
@@ -280,7 +280,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.7",
+        version="9.8",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XLSA License",
