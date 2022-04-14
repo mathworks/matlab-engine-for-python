@@ -1,6 +1,6 @@
 # MATLAB Engine API for Python
 
-The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLAB functionality directly with a Python application, creating an interface to call your MATLAB functions from Python code. 
+The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLAB functionality directly with a Python application, creating an interface to call functions from your MATLAB installation from Python code. 
 
 ---
 ## Requirements
