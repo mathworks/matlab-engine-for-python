@@ -53,7 +53,7 @@ $ python -m pip install matlabengine==9.7
 Prior to installation, check the default install location of MATLAB by calling ```matlabroot``` in a MATLAB Command Window. By default, macOS installs MATLAB at:<br>
 
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
-```/Applications/MATLAB_R2019a.app```
+```/Applications/MATLAB_R2019b.app```
 
 When MATLAB is not installed in the default location, the bin/*architecture* directory within the MATLAB root directory must be added to an environment variable. The path can be added to the environment variable within the shell startup configuration file (for example, .bashrc for bash shell or .tcshrc for tcsh).
 
