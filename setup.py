@@ -60,6 +60,7 @@ class _MatlabFinder(build_py):
     set_path = "MATLAB installation not found in {path1:s}. Add matlabroot/bin/{arch:s} to {path2:s}."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
+    no_matlab = "No MATLAB installation found in Windows Registry."
     incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. " + \
         "To install a compatible version, call python -m pip install matlabengine=={found:s}."
     
@@ -175,8 +176,11 @@ class _MatlabFinder(build_py):
                 break
         
         if not key_value:
-            vers = ', '.join(found_vers)
-            raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self.MATLAB_VER)} {vers}. {self.install_compatible}{vers[-1]}.")
+            if found_vers:
+                vers = ', '.join(found_vers)
+                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self.MATLAB_VER)} {vers}. {self.install_compatible}{found_vers[-1]}.")
+            else:
+                raise RuntimeError(f"{self.no_matlab}")
 
         return key_value       
 
@@ -283,7 +287,7 @@ if __name__ == '__main__':
         version="9.12",
         description='A module to call MATLAB from Python',
         author='MathWorks',
-        license="MathWorks XLSA License",
+        license="MathWorks XSLA License",
         url='https://github.com/mathworks/matlab-engine-for-python/',
         long_description=long_description,
         long_description_content_type="text/markdown",
