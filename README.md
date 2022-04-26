@@ -122,7 +122,7 @@ See [Troubleshoot MATLAB Errors in Python](https://www.mathworks.com/help/matlab
 ---
 
 ## License
-This software is licensed under the MathWorks XLSA License, which is available in the LICENSE.txt file within this repository.
+This software is licensed under the MathWorks XSLA License, which is available in the LICENSE.txt file within this repository.
 
 ---
 
