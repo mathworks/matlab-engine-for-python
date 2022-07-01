@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py 
 import os
+import re
 import sys
 import platform
 import xml.etree.ElementTree as xml
@@ -23,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12' 
+    MATLAB_VER = '9.12.10' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
@@ -63,6 +64,8 @@ class _MatlabFinder(build_py):
     no_matlab = "No MATLAB installation found in Windows Registry."
     incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. " + \
         "To install a compatible version, call python -m pip install matlabengine=={found:s}."
+    invalid_version_from_matlab_ver = "Format of MATLAB version '{ver:s}' is invalid."
+    invalid_version_from_eng = "Format of MATLAB Engine API version '{ver:s}' is invalid."
     
     def set_platform_and_arch(self):
         """
@@ -171,7 +174,7 @@ class _MatlabFinder(build_py):
             found_vers.append(sub_key)
             # Example: the version in the registry could be "9.13.1" whereas our version is "9.13"
             # we still want to allow this
-            if sub_key.startswith(self.MATLAB_VER):
+            if self._check_matlab_ver_against_engine(sub_key):
                 key_value = sub_key
                 break
         
@@ -184,10 +187,25 @@ class _MatlabFinder(build_py):
 
         return key_value       
 
+    def _check_matlab_ver_against_engine(self, matlab_ver):
+        re_major_minor = "^(\d+)\.(\d+)"
+        matlab_ver_match = re.match(re_major_minor, matlab_ver)
+        if not matlab_ver_match:
+            raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
+        eng_match = re.match(re_major_minor, self.MATLAB_VER)
+        if not eng_match:
+            raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
+        
+        matlab_ver_major_minor = (matlab_ver_match.group(1), matlab_ver_match.group(2))
+        eng_major_minor = (eng_match.group(1), eng_match.group(2))
+        
+        return (matlab_ver_major_minor == eng_major_minor)
+    
     def verify_matlab_release(self, root):
         """
         Parses VersionInfo.xml to verify the MATLAB release matches the supported release
-        for the Python Engine.
+        for the Python Engine. The major and minor version numbers must match. Everything
+        else will be ignored.
         """
         version_info = os.path.join(root, 'VersionInfo.xml')
         if not os.path.isfile(version_info):
@@ -201,10 +219,7 @@ class _MatlabFinder(build_py):
             if child.tag == 'release':
                 matlab_release = self.found_matlab = child.text
                 break
-        
-        if matlab_release != self.MATLAB_REL:
-            return False
-        return True
+        return matlab_release == self.MATLAB_REL
 
     def search_path_for_directory_unix(self):
         """
@@ -284,7 +299,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12",
+        version="9.12.10",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
