@@ -55,7 +55,7 @@ def add_dirs_to_path(bin_dir, engine_dir, extern_dir):
         sys.path.insert(0, extern_dir)
 
 # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-_supported_versions = set(['3_8', '3_9'])
+_supported_versions = set(['3_7', '3_8', '3_9'])
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
 if _version not in _supported_versions:
