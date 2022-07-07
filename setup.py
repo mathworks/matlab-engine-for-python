@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2021b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.11' 
+    MATLAB_VER = '9.11.16a0' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7', '3.8', '3.9'])
@@ -52,7 +52,8 @@ class _MatlabFinder(build_py):
     found_matlab = ''
 
     # ERROR MESSAGES
-    minimum_required = "No compatible version of MATLAB was found. This feature supports MATLAB R2019a and later."
+    minimum_maximum = "No compatible version of MATLAB was found. " + \
+        "This feature supports MATLAB {minimum:s} through {maximum:s}, inclusive."
     dir_not_found = "Directory not found: "
     install_compatible = "To install a compatible version, call python -m pip install matlabengine=="
     no_windows_install = "MATLAB installation not found in Windows Registry:"
@@ -171,34 +172,37 @@ class _MatlabFinder(build_py):
         found_vers = []
         for idx in range(num_keys):
             sub_key = winreg.EnumKey(key, idx)
-            found_vers.append(sub_key)
-            # Example: the version in the registry could be "9.13.1" whereas our version is "9.13"
-            # we still want to allow this
-            if self._check_matlab_ver_against_engine(sub_key):
-                key_value = sub_key
-                break
+            if sub_key in self.VER_TO_REL:
+                found_vers.append(sub_key)
+                # Example: the version in the registry could be "9.12" whereas the version in this file is "9.12.1".
+                # We want to allow this.
+                if self._check_matlab_ver_against_engine(sub_key):
+                    key_value = sub_key
+                    break
         
         if not key_value:
             if found_vers:
                 vers = ', '.join(found_vers)
-                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self.MATLAB_VER)} {vers}. {self.install_compatible}{found_vers[-1]}.")
+                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self._get_engine_ver_major_minor())} {vers}. {self.install_compatible}{found_vers[-1]}.")
             else:
                 raise RuntimeError(f"{self.no_matlab}")
 
         return key_value       
 
+    def _get_engine_ver_major_minor(self):
+        re_major_minor = "^(\d+)\.(\d+)"
+        eng_match = re.match(re_major_minor, self.MATLAB_VER)
+        if not eng_match:
+            raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
+        return (eng_match.group(1), eng_match.group(2))
+        
     def _check_matlab_ver_against_engine(self, matlab_ver):
         re_major_minor = "^(\d+)\.(\d+)"
         matlab_ver_match = re.match(re_major_minor, matlab_ver)
         if not matlab_ver_match:
             raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
-        eng_match = re.match(re_major_minor, self.MATLAB_VER)
-        if not eng_match:
-            raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
-        
+        eng_major_minor = self._get_engine_ver_major_minor()
         matlab_ver_major_minor = (matlab_ver_match.group(1), matlab_ver_match.group(2))
-        eng_major_minor = (eng_match.group(1), eng_match.group(2))
-        
         return (matlab_ver_major_minor == eng_major_minor)
     
     def verify_matlab_release(self, root):
@@ -250,9 +254,10 @@ class _MatlabFinder(build_py):
             if self.found_matlab:
                 if self.found_matlab in self.VER_TO_REL:
                     raise RuntimeError(self.incompatible_ver.format(ver=self.VER_TO_REL[self.found_matlab], found=self.found_matlab))
-                # we found a MATLAB release but it is older than R2019a
+                # We found a MATLAB release but it is older than the oldest version we support,
+                # or newer than the newest version we support.
                 else:
-                    raise RuntimeError(self.minimum_required)
+                    raise RuntimeError(self.minimum_maximum.format(minimum=self.VER_TO_REL[0], maximum=self.VER_TO_REL[-1]))
             else:
                 raise RuntimeError(self.set_path.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
         
@@ -299,7 +304,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.11",
+        version="9.11.16a0",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
