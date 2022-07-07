@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12.12' 
+    MATLAB_VER = '9.12.13' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
@@ -183,7 +183,8 @@ class _MatlabFinder(build_py):
         if not key_value:
             if found_vers:
                 vers = ', '.join(found_vers)
-                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self._get_engine_ver_major_minor())} {vers}. {self.install_compatible}{found_vers[-1]}.")
+                eng_ver_major_minor = self._get_engine_ver_major_minor()
+                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=eng_ver_major_minor)} {vers}. {self.install_compatible}{found_vers[-1]}.")
             else:
                 raise RuntimeError(f"{self.no_matlab}")
 
@@ -304,7 +305,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12.12",
+        version="9.12.13",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
