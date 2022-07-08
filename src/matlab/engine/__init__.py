@@ -1,4 +1,4 @@
-# Copyright 2022 MathWorks, Inc.
+#Copyright 2014-2020 MathWorks, Inc.
 
 """
 The MATLAB Engine enables you to call any MATLAB statement either synchronously
@@ -19,73 +19,53 @@ This example shows how to call a MATLAB function:
 """
 
 
+import os
 import sys
 import importlib
 import atexit
+import weakref
 import threading
-import platform
-import os
 
-package_folder = os.path.dirname(os.path.realpath(__file__))
-
-def add_dirs_to_path(bin_dir, engine_dir, extern_dir):
-        """
-        Adds MATLAB engine and extern/bin directories to sys.path.
-        """
-        path = 'PATH'
-
-        if not os.path.isdir(engine_dir):
-            raise RuntimeError("Could not find directory: {0}".format(engine_dir))
-        
-        if not os.path.isdir(extern_dir):
-            raise RuntimeError("Could not find directory: {0}".format(extern_dir))
-        
-        if platform.system() == 'Windows':
-            if not os.path.isdir(bin_dir):
-                raise RuntimeError("Could not find directory: {0}".format(bin_dir))
-            if path in os.environ:
-                paths = os.environ[path]
-                os.environ[path] = bin_dir + os.pathsep + paths
-            else:
-                os.environ[path] = bin_dir
-            if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
-                os.add_dll_directory(bin_dir)
-
-        sys.path.insert(0, engine_dir)
-        sys.path.insert(0, extern_dir)
-
-# MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-_supported_versions = set(['3_7', '3_8', '3_9'])
+# UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
+# when support for a Python version must be added or removed
+_supported_versions = ['2_7', '3_7', '3_8']
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
-if _version not in _supported_versions:
-    raise RuntimeError("Python {0}.{1} is not supported. Supported versions " + 
-    'are {2}.'.format(_ver[0], _ver[1, _supported_versions]))
+_PYTHONVERSION = None
 
-first_exception_message = ''
-second_exception_message = ''
+if _version in _supported_versions:
+    _PYTHONVERSION = _version
+else:
+    raise EnvironmentError("Python %s is not supported." % _version)
+
+_module_folder = os.path.dirname(os.path.realpath(__file__))
+_arch_filename = os.path.join(_module_folder, "_arch.txt")
+ 
 try:
-    pythonengine = importlib.import_module("matlabengineforpython"+_version)
-except Exception as first_error:
-    first_exception_message = str(first_error)
-
-if first_exception_message:
+    pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
+except:
     try:
-        arch_file = os.path.join(package_folder, '_arch.txt')
-        with open(arch_file, 'r') as root:
-            [arch, bin_folder, engine_folder, extern_bin] = [line.strip() for line in root.readlines()]
+        _arch_file = open(_arch_filename,'r')
+        _lines = _arch_file.readlines()
+        [_arch, _bin_dir,_engine_dir, _extern_bin_dir] = [x.rstrip() for x in _lines if x.rstrip() != ""]
+        _arch_file.close()
+        sys.path.insert(0,_engine_dir)
+        sys.path.insert(0,_extern_bin_dir)
 
-        add_dirs_to_path(bin_folder, engine_folder, extern_bin)
-        pythonengine = importlib.import_module("matlabengineforpython"+_version)
+        _envs = {'win32': 'PATH', 'win64': 'PATH'}
+        if _arch in _envs:
+            if _envs[_arch] in os.environ:
+                _env = os.environ[_envs[_arch]]
+                os.environ[_envs[_arch]] = _bin_dir + os.pathsep + os.environ[_envs[_arch]]
+            else:
+                os.environ[_envs[_arch]] = _bin_dir
+            if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
+                os.add_dll_directory(_bin_dir)
+        pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
+    except Exception as e:
+        raise EnvironmentError('Please reinstall MATLAB Engine for Python or contact '
+                               'MathWorks Technical Support for assistance: %s' % e)
 
-    except Exception as second_error:
-        str1 = 'Please reinstall MATLAB Engine for Python or contact '
-        str2 = 'MathWorks Technical Support for assistance:\nFirst issue: {}\nSecond issue: {}'.format(
-            first_exception_message, second_error)
-        second_exception_message = str1 + str2
-
-if second_exception_message:        
-    raise EnvironmentError(second_exception_message)
 
 """
 This lock can make sure the global variable _engines is updated correctly in
