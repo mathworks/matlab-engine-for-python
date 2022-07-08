@@ -21,7 +21,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.11.19a1
+$ python -m pip install matlabengine==9.11.19a2
 ```
 
 
@@ -46,7 +46,7 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:matlabroot/bin/glnxa64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.11.19a1
+$ python -m pip install matlabengine==9.11.19a2
 ```
 
 ### macOS
@@ -70,7 +70,7 @@ setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:matlabroot/bin/maci64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.11.19a1
+$ python -m pip install matlabengine==9.11.19a2
 ```
 
 ---
