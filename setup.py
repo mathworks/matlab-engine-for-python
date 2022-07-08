@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2021a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.10.1a1'
+    MATLAB_VER = '9.10.1a2'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7', '3.8'])
@@ -50,7 +50,7 @@ class _MatlabFinder(build_py):
 
     # ERROR MESSAGES
     minimum_maximum = "No compatible version of MATLAB was found. " + \
-        "This feature supports MATLAB {minimum:s} through {maximum:s}, inclusive."
+        "This feature supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
     dir_not_found = "Directory not found: "
     install_compatible = "To install a compatible version, call python -m pip install matlabengine=="
     no_windows_install = "MATLAB installation not found in Windows Registry:"
@@ -256,7 +256,12 @@ class _MatlabFinder(build_py):
                 # We found a MATLAB release but it is older than the oldest version we support,
                 # or newer than the newest version we support.
                 else:
-                    raise RuntimeError(self.minimum_maximum.format(minimum=self.VER_TO_REL[0], maximum=self.VER_TO_REL[-1]))
+                    v_to_r_keys = list(self.VER_TO_REL.keys())
+                    min_v = v_to_r_keys[0]
+                    min_r = self.VER_TO_REL[min_v]
+                    max_v = v_to_r_keys[-1]
+                    max_r = self.VER_TO_REL[max_v]
+                    raise RuntimeError(self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r))
             else:
                 raise RuntimeError(self.set_path.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
         
@@ -303,7 +308,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.10.1a1",
+        version="9.10.1a2",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
