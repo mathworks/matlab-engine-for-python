@@ -28,7 +28,7 @@ import threading
 
 # UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
 # when support for a Python version must be added or removed
-_supported_versions = ['2_7', '3_7', '3_8']
+_supported_versions = ['3_6', '3_7', '3_8']
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
 _PYTHONVERSION = None
@@ -39,7 +39,7 @@ else:
     raise EnvironmentError("Python %s is not supported." % _version)
 
 _module_folder = os.path.dirname(os.path.realpath(__file__))
-_arch_filename = os.path.join(_module_folder, "_arch.txt")
+_arch_filename = _module_folder+os.sep+"_arch.txt"
  
 try:
     pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
@@ -47,16 +47,15 @@ except:
     try:
         _arch_file = open(_arch_filename,'r')
         _lines = _arch_file.readlines()
-        [_arch, _bin_dir,_engine_dir, _extern_bin_dir] = [x.rstrip() for x in _lines if x.rstrip() != ""]
+        [_arch, _bin_dir,_engine_dir] = [x.rstrip() for x in _lines if x.rstrip() != ""]
         _arch_file.close()
         sys.path.insert(0,_engine_dir)
-        sys.path.insert(0,_extern_bin_dir)
 
         _envs = {'win32': 'PATH', 'win64': 'PATH'}
         if _arch in _envs:
             if _envs[_arch] in os.environ:
                 _env = os.environ[_envs[_arch]]
-                os.environ[_envs[_arch]] = _bin_dir + os.pathsep + os.environ[_envs[_arch]]
+                os.environ[_envs[_arch]] = _bin_dir+os.pathsep+os.environ[_envs[_arch]]
             else:
                 os.environ[_envs[_arch]] = _bin_dir
             if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
