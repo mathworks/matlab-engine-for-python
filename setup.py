@@ -24,16 +24,13 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2021b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.11.19a0' 
+    MATLAB_VER = '9.11.19a1' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7', '3.8', '3.9'])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
-        "9.6": "R2019a",
-        "9.7": "R2019b",
-        "9.8": "R2020a",
         "9.9": "R2020b",
         "9.10": "R2021a",
         "9.11": "R2021b",
@@ -306,7 +303,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.11.19a0",
+        version="9.11.19a1",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
