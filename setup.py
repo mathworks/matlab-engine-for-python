@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12.16' 
+    MATLAB_VER = '9.12.17a0' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
@@ -243,8 +243,8 @@ class _MatlabFinder(build_py):
             while not matlab_root and ending_idx < len(endings):
                 ending = endings[ending_idx]
                 if path.endswith(ending):
-                    # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found
-                    # non-empty string (MATLAB found) will break both loops
+                    # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found.
+                    # Non-empty string (MATLAB found) will break both loops.
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
             dir_idx += 1
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12.16",
+        version="9.12.17a0",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
