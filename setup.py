@@ -20,13 +20,13 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2022a'
+    MATLAB_REL = '[version -- see individual repository branches]'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12' 
+    MATLAB_VER = '[version -- see individual repository branches]' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
+    SUPPORTED_PYTHON_VERSIONS = set([version -- see individual repository branches])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12",
+        version="[version -- see individual repository branches]",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
@@ -313,5 +313,5 @@ if __name__ == '__main__':
             "Programming Language :: Python :: 3.9"
         ],
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        python_requires=">=3.8, <3.10"
+        python_requires="[version -- see individual repository branches]"
     )
