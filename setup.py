@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py 
 import os
+import re
 import sys
 import platform
 import xml.etree.ElementTree as xml
@@ -20,23 +21,21 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2022a'
+    MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12' 
+    MATLAB_VER = '9.13.1a0'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
+    SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
-        "9.6": "R2019a",
-        "9.7": "R2019b",
-        "9.8": "R2020a",
         "9.9": "R2020b",
         "9.10": "R2021a",
         "9.11": "R2021b",
-        "9.12": "R2022a"
+        "9.12": "R2022a",
+        "9.13": "R2022b"
     }
 
     DEFAULT_INSTALLS = {
@@ -51,7 +50,8 @@ class _MatlabFinder(build_py):
     found_matlab = ''
 
     # ERROR MESSAGES
-    minimum_required = "No compatible version of MATLAB was found. This feature supports MATLAB R2019a and later."
+    minimum_maximum = "No compatible version of MATLAB was found. " + \
+        "This feature supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
     dir_not_found = "Directory not found: "
     install_compatible = "To install a compatible version, call python -m pip install matlabengine=="
     no_windows_install = "MATLAB installation not found in Windows Registry:"
@@ -60,9 +60,11 @@ class _MatlabFinder(build_py):
     set_path = "MATLAB installation not found in {path1:s}. Add matlabroot/bin/{arch:s} to {path2:s}."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
-    no_matlab = "No MATLAB installation found in Windows Registry."
+    no_matlab = "No compatible MATLAB installation found in Windows Registry."
     incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. " + \
         "To install a compatible version, call python -m pip install matlabengine=={found:s}."
+    invalid_version_from_matlab_ver = "Format of MATLAB version '{ver:s}' is invalid."
+    invalid_version_from_eng = "Format of MATLAB Engine API version '{ver:s}' is invalid."
     
     def set_platform_and_arch(self):
         """
@@ -168,26 +170,46 @@ class _MatlabFinder(build_py):
         found_vers = []
         for idx in range(num_keys):
             sub_key = winreg.EnumKey(key, idx)
-            found_vers.append(sub_key)
-            # Example: the version in the registry could be "9.13.1" whereas our version is "9.13"
-            # we still want to allow this
-            if sub_key.startswith(self.MATLAB_VER):
-                key_value = sub_key
-                break
+            if sub_key in self.VER_TO_REL:
+                found_vers.append(sub_key)
+                # Example: the version in the registry could be "9.X" whereas the version in this file could be "9.X.Y".
+                # We want to allow this.
+                if self._check_matlab_ver_against_engine(sub_key):
+                    key_value = sub_key
+                    break
         
         if not key_value:
             if found_vers:
                 vers = ', '.join(found_vers)
-                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=self.MATLAB_VER)} {vers}. {self.install_compatible}{found_vers[-1]}.")
+                eng_ver_major_minor = self._get_engine_ver_major_minor()
+                eng_ver_major_minor_as_str = '{}.{}'.format(eng_ver_major_minor[0], eng_ver_major_minor[1])
+                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=eng_ver_major_minor_as_str)} {vers}. {self.install_compatible}{found_vers[-1]}.")
             else:
                 raise RuntimeError(f"{self.no_matlab}")
 
         return key_value       
 
+    def _get_engine_ver_major_minor(self):
+        re_major_minor = "^(\d+)\.(\d+)"
+        eng_match = re.match(re_major_minor, self.MATLAB_VER)
+        if not eng_match:
+            raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
+        return (eng_match.group(1), eng_match.group(2))
+        
+    def _check_matlab_ver_against_engine(self, matlab_ver):
+        re_major_minor = "^(\d+)\.(\d+)"
+        matlab_ver_match = re.match(re_major_minor, matlab_ver)
+        if not matlab_ver_match:
+            raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
+        eng_major_minor = self._get_engine_ver_major_minor()
+        matlab_ver_major_minor = (matlab_ver_match.group(1), matlab_ver_match.group(2))
+        return (matlab_ver_major_minor == eng_major_minor)
+    
     def verify_matlab_release(self, root):
         """
         Parses VersionInfo.xml to verify the MATLAB release matches the supported release
-        for the Python Engine.
+        for the Python Engine. The major and minor version numbers must match. Everything
+        else will be ignored.
         """
         version_info = os.path.join(root, 'VersionInfo.xml')
         if not os.path.isfile(version_info):
@@ -201,10 +223,7 @@ class _MatlabFinder(build_py):
             if child.tag == 'release':
                 matlab_release = self.found_matlab = child.text
                 break
-        
-        if matlab_release != self.MATLAB_REL:
-            return False
-        return True
+        return matlab_release == self.MATLAB_REL
 
     def search_path_for_directory_unix(self):
         """
@@ -225,8 +244,8 @@ class _MatlabFinder(build_py):
             while not matlab_root and ending_idx < len(endings):
                 ending = endings[ending_idx]
                 if path.endswith(ending):
-                    # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found
-                    # non-empty string (MATLAB found) will break both loops
+                    # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found.
+                    # Non-empty string (MATLAB found) will break both loops.
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
             dir_idx += 1
@@ -235,9 +254,15 @@ class _MatlabFinder(build_py):
             if self.found_matlab:
                 if self.found_matlab in self.VER_TO_REL:
                     raise RuntimeError(self.incompatible_ver.format(ver=self.VER_TO_REL[self.found_matlab], found=self.found_matlab))
-                # we found a MATLAB release but it is older than R2019a
+                # We found a MATLAB release but it is older than the oldest version we support,
+                # or newer than the newest version we support.
                 else:
-                    raise RuntimeError(self.minimum_required)
+                    v_to_r_keys = list(self.VER_TO_REL.keys())
+                    min_v = v_to_r_keys[0]
+                    min_r = self.VER_TO_REL[min_v]
+                    max_v = v_to_r_keys[-1]
+                    max_r = self.VER_TO_REL[max_v]
+                    raise RuntimeError(self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r))
             else:
                 raise RuntimeError(self.set_path.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
         
@@ -284,7 +309,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12",
+        version="9.13.1a0",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
@@ -310,8 +335,9 @@ if __name__ == '__main__':
             "Intended Audience :: Developers",
             # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
             "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9"
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10"
         ],
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        python_requires=">=3.8, <3.10"
+        python_requires=">=3.8, <3.11"
     )
