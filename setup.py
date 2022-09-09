@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.12.17a1' 
+    MATLAB_VER = '9.12.17a2' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9'])
@@ -57,7 +57,8 @@ class _MatlabFinder(build_py):
     no_windows_install = "MATLAB installation not found in Windows Registry:"
     unsupported_platform = "{platform:s} is not a supported platform."
     unsupported_python = "{python:s} is not supported. The supported Python versions are {supported:s}."
-    set_path = "MATLAB installation not found in {path1:s}. Add matlabroot/bin/{arch:s} to {path2:s}."
+    unset_env = "Environment variable {path1:s} has not been set. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
+    set_path = "MATLAB installation not found in {path1:s}. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
     no_matlab = "No compatible MATLAB installation found in Windows Registry."
@@ -116,7 +117,7 @@ class _MatlabFinder(build_py):
             path_dirs.extend(path_string.split(os.pathsep))
         
         if not path_dirs:
-            raise RuntimeError(self.set_path.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
+            raise RuntimeError(self.unset_env.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
         
         return path_dirs
     
@@ -172,7 +173,7 @@ class _MatlabFinder(build_py):
             sub_key = winreg.EnumKey(key, idx)
             if sub_key in self.VER_TO_REL:
                 found_vers.append(sub_key)
-                # Example: the version in the registry could be "9.12" whereas the version in this file is "9.12.1".
+                # Example: the version in the registry could be "9.X" whereas the version in this file could be "9.X.Y".
                 # We want to allow this.
                 if self._check_matlab_ver_against_engine(sub_key):
                     key_value = sub_key
@@ -309,7 +310,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.12.17a1",
+        version="9.12.17a2",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
