@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2021b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.11.19a4' 
+    MATLAB_VER = '9.11.19a5' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7', '3.8', '3.9'])
@@ -53,7 +53,6 @@ class _MatlabFinder(build_py):
     minimum_maximum = "No compatible version of MATLAB was found. " + \
         "This feature supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
     dir_not_found = "Directory not found: "
-    install_compatible = "To install a compatible version, call python -m pip install matlabengine=="
     no_windows_install = "MATLAB installation not found in Windows Registry:"
     unsupported_platform = "{platform:s} is not a supported platform."
     unsupported_python = "{python:s} is not supported. The supported Python versions are {supported:s}."
@@ -62,8 +61,7 @@ class _MatlabFinder(build_py):
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
     no_matlab = "No compatible MATLAB installation found in Windows Registry."
-    incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. " + \
-        "To install a compatible version, call python -m pip install matlabengine=={found:s}."
+    incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. "
     invalid_version_from_matlab_ver = "Format of MATLAB version '{ver:s}' is invalid."
     invalid_version_from_eng = "Format of MATLAB Engine API version '{ver:s}' is invalid."
     
@@ -184,7 +182,7 @@ class _MatlabFinder(build_py):
                 vers = ', '.join(found_vers)
                 eng_ver_major_minor = self._get_engine_ver_major_minor()
                 eng_ver_major_minor_as_str = '{}.{}'.format(eng_ver_major_minor[0], eng_ver_major_minor[1])
-                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=eng_ver_major_minor_as_str)} {vers}. {self.install_compatible}{found_vers[-1]}.")
+                raise RuntimeError(f"{self.no_compatible_matlab.format(ver=eng_ver_major_minor_as_str)} {vers}.")
             else:
                 raise RuntimeError(f"{self.no_matlab}")
 
@@ -310,7 +308,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.11.19a4",
+        version="9.11.19a5",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
