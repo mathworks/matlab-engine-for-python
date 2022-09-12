@@ -1,4 +1,4 @@
-#Copyright 2014-2021 MathWorks, Inc.
+#Copyright 2014-2020 MathWorks, Inc.
 
 """
 The MATLAB Engine enables you to call any MATLAB statement either synchronously
@@ -28,7 +28,7 @@ import threading
 
 # UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
 # when support for a Python version must be added or removed
-_supported_versions = ['2_7', '3_7', '3_8', '3_9']
+_supported_versions = ['2_7', '3_7', '3_8']
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
 _PYTHONVERSION = None
@@ -40,15 +40,10 @@ else:
 
 _module_folder = os.path.dirname(os.path.realpath(__file__))
 _arch_filename = os.path.join(_module_folder, "_arch.txt")
-success = False 
-firstExceptionMessage = ''
-secondExceptionMessage = ''
+ 
 try:
     pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
-except Exception as firstE:
-    firstExceptionMessage = str(firstE)
-
-if firstExceptionMessage:
+except:
     try:
         _arch_file = open(_arch_filename,'r')
         _lines = _arch_file.readlines()
@@ -67,14 +62,9 @@ if firstExceptionMessage:
             if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
                 os.add_dll_directory(_bin_dir)
         pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
-    except Exception as secondE:
-        str1 = 'Please reinstall MATLAB Engine for Python or contact '
-        str2 = 'MathWorks Technical Support for assistance:\nFirst issue: {}\nSecond issue: {}'.format(
-            firstExceptionMessage, secondE)
-        secondExceptionMessage = str1 + str2
-
-if secondExceptionMessage:        
-    raise EnvironmentError(secondExceptionMessage)
+    except Exception as e:
+        raise EnvironmentError('Please reinstall MATLAB Engine for Python or contact '
+                               'MathWorks Technical Support for assistance: %s' % e)
 
 
 """
