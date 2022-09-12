@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2020b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.9.1a2' 
+    MATLAB_VER = '9.9.1a3' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.6', '3.7', '3.8'])
@@ -281,8 +281,7 @@ class _MatlabFinder(build_py):
         with open(file_location, 'w') as root_file:
             root_file.write(self.arch + '\n')
             root_file.write(bin_arch + '\n')
-            root_file.write(engine_arch + '\n')
-            root_file.write(extern_bin)
+            root_file.write(engine_arch)
 
     def run(self):
         """
@@ -309,7 +308,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.9.1a2",
+        version="9.9.1a3",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
