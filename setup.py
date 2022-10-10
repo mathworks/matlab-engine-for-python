@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2021b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.11.19' 
+    MATLAB_VER = '9.11.20' 
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.7', '3.8', '3.9'])
@@ -208,8 +208,7 @@ class _MatlabFinder(build_py):
     def verify_matlab_release(self, root):
         """
         Parses VersionInfo.xml to verify the MATLAB release matches the supported release
-        for the Python Engine. The major and minor version numbers must match. Everything
-        else will be ignored.
+        for the Python Engine.
         """
         version_info = os.path.join(root, 'VersionInfo.xml')
         if not os.path.isfile(version_info):
@@ -309,7 +308,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.11.19",
+        version="9.11.20",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
