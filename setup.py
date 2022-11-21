@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.2'
+    MATLAB_VER = '9.13.2a0'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -82,6 +82,8 @@ class _MatlabFinder(build_py):
             self.arch = 'glnxa64'
         elif self.platform == 'Darwin':
             if platform.mac_ver()[-1] == 'arm64':
+                # We will change this value later in the script if we find that the user is 
+                # using an installation of MATLAB built for maci64, to be run under Rosetta.
                 self.arch = 'maca64'
             else:
                 self.arch = 'maci64'
@@ -234,6 +236,10 @@ class _MatlabFinder(build_py):
         dir_to_find = os.path.join('bin', self.arch)
         # directory could end with slashes
         endings = [dir_to_find, dir_to_find + os.sep]
+        if self.arch == 'maca64':
+            addl_dir_to_find = 'maci64'
+            endings.append(addl_dir_to_find)
+            endings.append(addl_dir_to_find + os.sep)
 
         matlab_root = ''
         dir_idx = 0
@@ -245,6 +251,13 @@ class _MatlabFinder(build_py):
                 if path.endswith(ending):
                     # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found.
                     # Non-empty string (MATLAB found) will break both loops.
+                    if self.arch == 'maca64' and ending[:6] == 'maci64':
+                        # We found a maci64 installation. Use it (under Rosetta) rather than maca64.
+                        # This means that if the user wants to use maci64 on a maca64 machine,
+                        # they need to make sure that the maci64 installation is in the default 
+                        # location if there is one, or if not, that it is earlier on the path than
+                        # any maca64 installations.
+                        self.arch = 'maci64'
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
             dir_idx += 1
@@ -308,7 +321,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.2",
+        version="9.13.2a0",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
