@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.2a0'
+    MATLAB_VER = '9.13.3a1'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -82,8 +82,8 @@ class _MatlabFinder(build_py):
             self.arch = 'glnxa64'
         elif self.platform == 'Darwin':
             if platform.mac_ver()[-1] == 'arm64':
-                # We will change this value later in the script if we find that the user is 
-                # using an installation of MATLAB built for maci64, to be run under Rosetta.
+                # This value will be changed later in the script if a maci64 MATLAB 
+                # installation, to be run under Rosetta, is encountered.
                 self.arch = 'maca64'
             else:
                 self.arch = 'maci64'
@@ -209,7 +209,7 @@ class _MatlabFinder(build_py):
     
     def verify_matlab_release(self, root):
         """
-        Parses VersionInfo.xml to verify the MATLAB release matches the supported release
+        Parses VersionInfo.xml to verify that the MATLAB release matches the supported release
         for the Python Engine.
         """
         version_info = os.path.join(root, 'VersionInfo.xml')
@@ -252,11 +252,13 @@ class _MatlabFinder(build_py):
                     # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found.
                     # Non-empty string (MATLAB found) will break both loops.
                     if self.arch == 'maca64' and ending[:6] == 'maci64':
-                        # We found a maci64 installation. Use it (under Rosetta) rather than maca64.
-                        # This means that if the user wants to use maci64 on a maca64 machine,
-                        # they need to make sure that the maci64 installation is in the default 
-                        # location if there is one, or if not, that it is earlier on the path than
-                        # any maca64 installations.
+                        # Found a maci64 installation to be used under Rosetta.
+                        # To use maci64 on a maca64 machine, one of the following must be true:
+                        # (1) there must be a maci64 installation in the default location
+                        # (see DEFAULT_INSTALLS), or
+                        # (2) there must be no Mac installation in the default location
+                        # and the maci64 installation must be earlier on DYLD_LIBRARY_PATH
+                        # than any maca64 installation.
                         self.arch = 'maci64'
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
@@ -266,8 +268,8 @@ class _MatlabFinder(build_py):
             if self.found_matlab:
                 if self.found_matlab in self.VER_TO_REL:
                     raise RuntimeError(self.incompatible_ver.format(ver=self.VER_TO_REL[self.found_matlab], found=self.found_matlab))
-                # We found a MATLAB release but it is older than the oldest version we support,
-                # or newer than the newest version we support.
+                # Found a MATLAB release but it is older than the oldest version supported,
+                # or newer than the newest version supported.
                 else:
                     v_to_r_keys = list(self.VER_TO_REL.keys())
                     min_v = v_to_r_keys[0]
@@ -321,7 +323,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.2a0",
+        version="9.13.3a1",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
