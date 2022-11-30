@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a6'
+    MATLAB_VER = '9.13.3a7'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -59,7 +59,7 @@ class _MatlabFinder(build_py):
     unsupported_platform = "{platform:s} is not a supported platform."
     unsupported_python = "{python:s} is not supported. The supported Python versions are {supported:s}."
     unset_env = "Environment variable {path1:s} has not been set. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
-    install_or_set_path = "MATLAB {ver:s} installation not found. Install to default location, or add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a MATLAB {ver:s} installation."
+    install_or_set_path = "MATLAB {ver:s} installation not found. Install to default location, or add <matlabroot>/bin/{arch:s} to {path:s}, where <matlabroot> is the root of a MATLAB {ver:s} installation."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
     no_matlab = "No compatible MATLAB installation found in Windows Registry."
@@ -394,7 +394,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a6",
+        version="9.13.3a7",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
