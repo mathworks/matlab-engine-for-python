@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a1'
+    MATLAB_VER = '9.13.3a2'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -61,7 +61,7 @@ class _MatlabFinder(build_py):
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
     no_matlab = "No compatible MATLAB installation found in Windows Registry."
-    incompatible_ver = "MATLAB version {ver:s} was found, but MATLAB Engine API for Python is not compatible with it. " + \
+    incompatible_ver = "MATLAB version {ver:s} was found, but this release of MATLAB Engine API for Python is not compatible with it. " + \
         "To install a compatible version, call python -m pip install matlabengine=={found:s}."
     invalid_version_from_matlab_ver = "Format of MATLAB version '{ver:s}' is invalid."
     invalid_version_from_eng = "Format of MATLAB Engine API version '{ver:s}' is invalid."
@@ -82,8 +82,6 @@ class _MatlabFinder(build_py):
             self.arch = 'glnxa64'
         elif self.platform == 'Darwin':
             if platform.mac_ver()[-1] == 'arm64':
-                # This value will be changed later in the script if a maci64 MATLAB 
-                # installation, to be run under Rosetta, is encountered.
                 self.arch = 'maca64'
             else:
                 self.arch = 'maci64'
@@ -226,20 +224,15 @@ class _MatlabFinder(build_py):
                 break
         return matlab_release == self.MATLAB_REL
 
-    def search_path_for_directory_unix(self):
+    def search_path_for_directory_unix(self, arch, path_dirs):
         """
         Used for finding MATLAB root in UNIX systems. Searches all paths ending in
         /bin/<arch> for the presence of MATLAB file to ensure the path is within
         the MATLAB tree. 
         """
-        path_dirs = self._create_path_list()
-        dir_to_find = os.path.join('bin', self.arch)
+        dir_to_find = os.path.join('bin', arch)
         # directory could end with slashes
         endings = [dir_to_find, dir_to_find + os.sep]
-        if self.arch == 'maca64':
-            addl_dir_to_find = 'maci64'
-            endings.append(addl_dir_to_find)
-            endings.append(addl_dir_to_find + os.sep)
 
         matlab_root = ''
         dir_idx = 0
@@ -251,23 +244,17 @@ class _MatlabFinder(build_py):
                 if path.endswith(ending):
                     # _get_matlab_root_from_unix_bin will return an empty string if MATLAB is not found.
                     # Non-empty string (MATLAB found) will break both loops.
-                    if self.arch == 'maca64' and ending[:6] == 'maci64':
-                        # Found a maci64 installation to be used under Rosetta.
-                        # To use maci64 on a maca64 machine, one of the following must be true:
-                        # (1) there must be a maci64 installation in the default location
-                        # (see DEFAULT_INSTALLS), or
-                        # (2) there must be no Mac installation in the default location
-                        # and the maci64 installation must be earlier on DYLD_LIBRARY_PATH
-                        # than any maca64 installation.
-                        self.arch = 'maci64'
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
             dir_idx += 1
-        
+            
+        return matlab_root
+    
+    def _err_msg_if_bad_matlab_root(self, matlab_root):
         if not matlab_root:
             if self.found_matlab:
                 if self.found_matlab in self.VER_TO_REL:
-                    raise RuntimeError(self.incompatible_ver.format(ver=self.VER_TO_REL[self.found_matlab], found=self.found_matlab))
+                    return self.incompatible_ver.format(ver=self.VER_TO_REL[self.found_matlab], found=self.found_matlab)
                 # Found a MATLAB release but it is older than the oldest version supported,
                 # or newer than the newest version supported.
                 else:
@@ -276,14 +263,15 @@ class _MatlabFinder(build_py):
                     min_r = self.VER_TO_REL[min_v]
                     max_v = v_to_r_keys[-1]
                     max_r = self.VER_TO_REL[max_v]
-                    raise RuntimeError(self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r))
+                    return self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
             else:
-                raise RuntimeError(self.set_path.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
+                return self.set_path.format(path1=self.path_name, arch=arch, path2=self.path_name)
         
         if not os.path.isdir(matlab_root):
-            raise RuntimeError(f"{self.dir_not_found} {matlab_root}")
-        return matlab_root
-    
+            return f"{self.dir_not_found} {matlab_root}"
+            
+        return ''
+        
     def write_text_file(self, matlab_root):
         """
         Writes root.txt for use at import time.
@@ -311,7 +299,12 @@ class _MatlabFinder(build_py):
             if self.unix_default_install_exists():
                 matlab_root = self.DEFAULT_INSTALLS[self.platform]
             else:
-                matlab_root = self.search_path_for_directory_unix()
+                path_dirs = self._create_path_list()
+                matlab_root = self.search_path_for_directory_unix(self.arch, path_dirs)
+                err_msg = self._err_msg_if_bad_matlab_root(matlab_root)
+                if err_msg:
+                    raise RuntimeError(err_msg)
+
         self.write_text_file(matlab_root)
         build_py.run(self)
 
@@ -323,7 +316,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a1",
+        version="9.13.3a2",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
