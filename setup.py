@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a3'
+    MATLAB_VER = '9.13.3a4'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -44,7 +44,7 @@ class _MatlabFinder(build_py):
     }
 
     arch = ''
-    path_name = ''
+    path_env_var_name = ''
     python_ver = ''
     platform = ''
     found_matlab = ''
@@ -59,7 +59,7 @@ class _MatlabFinder(build_py):
     unsupported_platform = "{platform:s} is not a supported platform."
     unsupported_python = "{python:s} is not supported. The supported Python versions are {supported:s}."
     unset_env = "Environment variable {path1:s} has not been set. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
-    set_path = "MATLAB installation not found in {path1:s}. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
+    install_or_set_path = "MATLAB {ver:s} installation not found. Install to default location, or add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a MATLAB {ver:s} installation."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
         "MATLAB Engine API for Python is compatible with version {ver:s}. The found versions were"
     no_matlab = "No compatible MATLAB installation found in Windows Registry."
@@ -79,7 +79,7 @@ class _MatlabFinder(build_py):
         if self.platform not in self.PLATFORM_DICT:
             raise RuntimeError(self.unsupported_platform.format(platform=self.platform))
         else:
-            self.path_name = self.PLATFORM_DICT[self.platform]
+            self.path_env_var_name = self.PLATFORM_DICT[self.platform]
         
         if self.platform == 'Windows':
             self.arch = 'win64'
@@ -141,12 +141,13 @@ class _MatlabFinder(build_py):
         """
         path_dirs = []
         path_string = ''
-        if self.path_name in os.environ:
-            path_string = os.environ[self.path_name]
+        if self.path_env_var_name in os.environ:
+            path_string = os.environ[self.path_env_var_name]
             path_dirs.extend(path_string.split(os.pathsep))
         
         if not path_dirs:
-            raise RuntimeError(self.unset_env.format(path1=self.path_name, arch=self.arch, path2=self.path_name))
+            raise RuntimeError(self.unset_env.format(path1=self.path_env_var_name, 
+                arch=self.arch, path2=self.path_env_var_name))
         
         return path_dirs
     
@@ -323,7 +324,10 @@ class _MatlabFinder(build_py):
                     max_r = self.VER_TO_REL[max_v]
                     return self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
             else:
-                return self.set_path.format(path1=self.path_name, arch=arch, path2=self.path_name)
+                # If we reach this line, we assume that the default location has already been checked for an
+                # appropriate MATLAB installation but none was found.
+                return self.install_or_set_path.format(ver=MATLAB_REL, arch=self.arch, 
+                    path=self.path_env_var_name)
         
         if not os.path.isdir(matlab_root):
             return f"{self.dir_not_found} {matlab_root}"
@@ -389,7 +393,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a3",
+        version="9.13.3a4",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
