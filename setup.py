@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a2'
+    MATLAB_VER = '9.13.3a3'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -48,7 +48,9 @@ class _MatlabFinder(build_py):
     python_ver = ''
     platform = ''
     found_matlab = ''
-
+    found_matlab_with_wrong_arch_in_default_install = ''
+    found_matlab_with_wrong_arch_in_path = ''
+    
     # ERROR MESSAGES
     minimum_maximum = "No compatible version of MATLAB was found. " + \
         "This feature supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
@@ -65,6 +67,9 @@ class _MatlabFinder(build_py):
         "To install a compatible version, call python -m pip install matlabengine=={found:s}."
     invalid_version_from_matlab_ver = "Format of MATLAB version '{ver:s}' is invalid."
     invalid_version_from_eng = "Format of MATLAB Engine API version '{ver:s}' is invalid."
+    next_steps = "Reinstall MATLAB, use DYLD_LIBRARY_PATH to specify a different MATLAB installation, or use a different Python interpreter."
+    wrong_arch_in_default_install = "MATLAB installation in {path1:s} is {matlab_arch:s}, but Python interpreter is {python_arch:s}. {next_steps:s}."
+    wrong_arch_in_path = "MATLAB installation in {path1:s}, listed in DYLD_LIBRARY_PATH, is {matlab_arch:s}, but Python interpreter is {python_arch:s}. {next_steps:s}."
     
     def set_platform_and_arch(self):
         """
@@ -103,7 +108,32 @@ class _MatlabFinder(build_py):
         Determines whether MATLAB is installed in default UNIX location.
         """
         path = self.DEFAULT_INSTALLS[self.platform]
-        return os.path.exists(path)
+        if not os.path.exists(path):
+            return False
+        
+        if self.platform == 'Darwin':
+            # On Mac, we need to further verify that there is a 'bin/maci64' subdir if the Python is maci64
+            # or a 'bin/maca64' subdir if the Python is maca64.
+            path_to_bin = os.path.join(path, 'bin', self.arch)
+            if os.path.exists(path_to_bin):
+                # The path exists, and we don't need to do anything further.
+                return True
+                
+            if self.arch == 'maci64':
+                alternate_arch = 'maca64'
+            else:
+                alternate_arch = 'maci64'
+                
+            if os.path.exists(os.path.join(path, 'bin', alternate_arch)):
+                # There is a default install, but its arch doesn't match the Python arch. Save this info
+                # so that if we don't find an install with a valid arch in DYLD_LIBRARY_PATH, we can
+                # issue an error message that says that there is a Mac installation in the default 
+                # location that has the wrong arch. The user can choose whether to change the
+                # Python interpreter or the MATLAB installation so that the arch will match.
+                found_matlab_with_wrong_arch_in_default_install = path
+                return False
+                
+        return True
     
     def _create_path_list(self):
         """
@@ -120,6 +150,31 @@ class _MatlabFinder(build_py):
         
         return path_dirs
     
+    def _get_alternate_arch(self):
+        if self.arch == 'maci64':
+            return 'maca64'
+        if self.arch == 'maca64':
+            return 'maci64'
+        return self.arch
+
+    def _arch_in_mac_dir_is_correct(self, dir):
+        ARCH_LEN = 6 # == len('maci64') or len('maca64')
+        BIN_ARCH_LEN = ARCH_LEN + 4 # == len('bin/maci64') or len('bin/maca64')
+        
+        if len(dir) < BIN_ARCH_LEN:
+            return False
+        
+        if dir[-1] == os.sep:
+            # It's safe to look at dir[[-1 * (ARCH_LEN+1)] because BIN_ARCH_LEN > ARCH_LEN + 1.
+            possible_arch = dir[-1 * (ARCH_LEN+1) : -1]
+        else:
+            possible_arch = dir[-1 * ARCH_LEN]
+            
+        if possible_arch == self.arch:
+            return True
+        else:
+            return False            
+            
     def _get_matlab_root_from_unix_bin(self, dir):
         """
         Searches bin directory for presence of MATLAB file. Used only for
@@ -129,7 +184,10 @@ class _MatlabFinder(build_py):
         possible_root = os.path.normpath(os.path.join(dir, os.pardir, os.pardir))
         matlab_root = ''
         if os.path.isfile(matlab_path) and self.verify_matlab_release(possible_root):
-            matlab_root = possible_root
+            if self.platform == 'Darwin' and not self._arch_in_mac_dir_is_correct(dir):
+                found_matlab_with_wrong_arch_in_path = possible_root
+            else:
+                matlab_root = possible_root
             
         return matlab_root
     
@@ -301,9 +359,24 @@ class _MatlabFinder(build_py):
             else:
                 path_dirs = self._create_path_list()
                 matlab_root = self.search_path_for_directory_unix(self.arch, path_dirs)
-                err_msg = self._err_msg_if_bad_matlab_root(matlab_root)
-                if err_msg:
-                    raise RuntimeError(err_msg)
+            err_msg = self._err_msg_if_bad_matlab_root(matlab_root)
+            if err_msg:
+                if self.platform == 'Darwin':
+                    if self.found_matlab_with_wrong_arch_in_default_install:
+                        raise RuntimeError(
+                            self.wrong_arch_in_default_install.format(
+                                path1=self.found_matlab_with_wrong_arch_in_default_install,
+                                matlab_arch=self._get_alternate_arch(),
+                                python_arch=self.arch,
+                                next_steps=self.next_steps))
+                    if self.found_matlab_with_wrong_arch_in_path:
+                        raise RuntimeError(
+                            self.wrong_arch_in_path.format(
+                                path1=self.found_matlab_with_wrong_arch_in_path,
+                                matlab_arch=self._get_alternate_arch(),
+                                python_arch=self.arch,
+                                next_steps=self.next_steps))
+                raise RuntimeError(err_msg)
 
         self.write_text_file(matlab_root)
         build_py.run(self)
@@ -316,7 +389,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a2",
+        version="9.13.3a3",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
