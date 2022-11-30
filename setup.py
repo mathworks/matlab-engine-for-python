@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a4'
+    MATLAB_VER = '9.13.3a5'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -146,8 +146,9 @@ class _MatlabFinder(build_py):
             path_dirs.extend(path_string.split(os.pathsep))
         
         if not path_dirs:
-            raise RuntimeError(self.unset_env.format(path1=self.path_env_var_name, 
-                arch=self.arch, path2=self.path_env_var_name))
+            raise RuntimeError(self.install_or_set_path.format(
+                ver=MATLAB_REL, arch=self.arch, 
+                    path=self.path_env_var_name))
         
         return path_dirs
     
@@ -393,7 +394,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a4",
+        version="9.13.3a5",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
