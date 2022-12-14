@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py 
 import os
+import pdb
 import re
 import sys
 import platform
@@ -24,7 +25,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a7'
+    MATLAB_VER = '9.13.3a8'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -356,6 +357,7 @@ class _MatlabFinder(build_py):
         self.set_platform_and_arch()
         self.set_python_version()
 
+        pdb.set_trace()
         if self.platform == 'Windows':
             matlab_root = self.get_matlab_root_from_windows_reg()
         else:
@@ -394,7 +396,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a7",
+        version="9.13.3a8",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
