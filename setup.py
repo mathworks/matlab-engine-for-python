@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a9'
+    MATLAB_VER = '9.13.3a10'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -135,7 +135,7 @@ class _MatlabFinder(build_py):
                 # issue an error message that says that there is a Mac installation in the default 
                 # location that has the wrong arch. The user can choose whether to change the
                 # Python interpreter or the MATLAB installation so that the arch will match.
-                found_matlab_with_wrong_arch_in_default_install = path
+                self.found_matlab_with_wrong_arch_in_default_install = path
                 return False
                 
         return True
@@ -177,7 +177,8 @@ class _MatlabFinder(build_py):
             possible_arch = dir[-1 * (ARCH_LEN+1) : -1]
         else:
             possible_arch = dir[-1 * ARCH_LEN]
-            
+        
+        self._print_if_verbose(f'possible_arch: {possible_arch}; self.arch: {self.arch}')
         if possible_arch == self.arch:
             return True
         else:
@@ -193,7 +194,8 @@ class _MatlabFinder(build_py):
         matlab_root = ''
         if os.path.isfile(matlab_path) and self.verify_matlab_release(possible_root):
             if self.platform == 'Darwin' and not self._arch_in_mac_dir_is_correct(dir):
-                found_matlab_with_wrong_arch_in_path = possible_root
+                self.found_matlab_with_wrong_arch_in_path = possible_root
+                self._print_if_verbose(f'self.found_matlab_with_wrong_arch_in_path: {self.found_matlab_with_wrong_arch_in_path}')
             else:
                 matlab_root = possible_root
         self._print_if_verbose(f'_get_matlab_root_from_unix_bin returned: {matlab_root}')
@@ -406,7 +408,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a9",
+        version="9.13.3a10",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
