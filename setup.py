@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a10'
+    MATLAB_VER = '9.13.3a11'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -176,7 +176,7 @@ class _MatlabFinder(build_py):
             # It's safe to look at dir[[-1 * (ARCH_LEN+1)] because BIN_ARCH_LEN > ARCH_LEN + 1.
             possible_arch = dir[-1 * (ARCH_LEN+1) : -1]
         else:
-            possible_arch = dir[-1 * ARCH_LEN]
+            possible_arch = dir[-1 * ARCH_LEN :]
         
         self._print_if_verbose(f'possible_arch: {possible_arch}; self.arch: {self.arch}')
         if possible_arch == self.arch:
@@ -408,7 +408,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a10",
+        version="9.13.3a11",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
