@@ -1,0 +1,4 @@
+win64
+C:\UserAddedPrograms\MATLAB\R2022b\bin\win64
+C:\UserAddedPrograms\MATLAB\R2022b\extern\engines\python\dist\matlab\engine\win64
+C:\UserAddedPrograms\MATLAB\R2022b\extern\bin\win64

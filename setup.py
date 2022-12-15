@@ -3,7 +3,6 @@
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py 
 import os
-import pdb
 import re
 import sys
 import platform
@@ -25,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2022b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.13.3a8'
+    MATLAB_VER = '9.13.3a9'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -51,10 +50,11 @@ class _MatlabFinder(build_py):
     found_matlab = ''
     found_matlab_with_wrong_arch_in_default_install = ''
     found_matlab_with_wrong_arch_in_path = ''
+    verbose = True
     
     # ERROR MESSAGES
     minimum_maximum = "No compatible version of MATLAB was found. " + \
-        "This feature supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
+        "Version {this_v:s} was found, but this feature only supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
     dir_not_found = "Directory not found: "
     no_windows_install = "MATLAB installation not found in Windows Registry:"
     unsupported_platform = "{platform:s} is not a supported platform."
@@ -72,6 +72,10 @@ class _MatlabFinder(build_py):
     wrong_arch_in_default_install = "MATLAB installation in {path1:s} is {matlab_arch:s}, but Python interpreter is {python_arch:s}. {next_steps:s}."
     wrong_arch_in_path = "MATLAB installation in {path1:s}, listed in DYLD_LIBRARY_PATH, is {matlab_arch:s}, but Python interpreter is {python_arch:s}. {next_steps:s}."
     
+    def _print_if_verbose(self, msg):
+        if self.verbose:
+            print(msg)
+            
     def set_platform_and_arch(self):
         """
         Sets the platform and architecture. 
@@ -150,7 +154,8 @@ class _MatlabFinder(build_py):
             raise RuntimeError(self.install_or_set_path.format(
                 ver=self.MATLAB_REL, arch=self.arch, 
                     path=self.path_env_var_name))
-        
+                    
+        self._print_if_verbose(f'_create_path_list returned: {path_dirs}')
         return path_dirs
     
     def _get_alternate_arch(self):
@@ -191,7 +196,7 @@ class _MatlabFinder(build_py):
                 found_matlab_with_wrong_arch_in_path = possible_root
             else:
                 matlab_root = possible_root
-            
+        self._print_if_verbose(f'_get_matlab_root_from_unix_bin returned: {matlab_root}')
         return matlab_root
     
     def get_matlab_root_from_windows_reg(self):
@@ -205,7 +210,9 @@ class _MatlabFinder(build_py):
             raise RuntimeError(f"{self.no_windows_install} {err}")
         
         matlab_ver_key = self._find_matlab_key_from_windows_registry(key)
-        return self._get_root_from_version_key(reg, matlab_ver_key)
+        ret = self._get_root_from_version_key(reg, matlab_ver_key)
+        self._print_if_verbose(f'get_matlab_root_from_windows_reg returned: {ret}')
+        return ret
     
     def _get_root_from_version_key(self, reg, ver_key):
         """
@@ -218,6 +225,7 @@ class _MatlabFinder(build_py):
         except (OSError, FileNotFoundError) as err:
             raise RuntimeError(f"{self.no_windows_install} {err}")
         
+        self._print_if_verbose(f'_get_root_from_version_key returned: {matlab_root}')
         return matlab_root
     
     def _find_matlab_key_from_windows_registry(self, key):
@@ -248,6 +256,7 @@ class _MatlabFinder(build_py):
             else:
                 raise RuntimeError(f"{self.no_matlab}")
 
+        self._print_if_verbose(f'_find_matlab_key_from_windows_registry returned: {key_value}')
         return key_value       
 
     def _get_engine_ver_major_minor(self):
@@ -255,7 +264,9 @@ class _MatlabFinder(build_py):
         eng_match = re.match(re_major_minor, self.MATLAB_VER)
         if not eng_match:
             raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
-        return (eng_match.group(1), eng_match.group(2))
+        ret = (eng_match.group(1), eng_match.group(2))
+        self._print_if_verbose(f'_get_engine_ver_major_minor returned: {ret}')
+        return ret
         
     def _check_matlab_ver_against_engine(self, matlab_ver):
         re_major_minor = "^(\d+)\.(\d+)"
@@ -308,7 +319,7 @@ class _MatlabFinder(build_py):
                     matlab_root = self._get_matlab_root_from_unix_bin(path)
                 ending_idx += 1
             dir_idx += 1
-            
+        self._print_if_verbose(f'search_path_for_directory_unix returned: {matlab_root}')
         return matlab_root
     
     def _err_msg_if_bad_matlab_root(self, matlab_root):
@@ -324,7 +335,7 @@ class _MatlabFinder(build_py):
                     min_r = self.VER_TO_REL[min_v]
                     max_v = v_to_r_keys[-1]
                     max_r = self.VER_TO_REL[max_v]
-                    return self.minimum_maximum.format(min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
+                    return self.minimum_maximum.format(this_v=self.found_matlab, min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
             else:
                 # If we reach this line, we assume that the default location has already been checked for an
                 # appropriate MATLAB installation but none was found.
@@ -357,7 +368,6 @@ class _MatlabFinder(build_py):
         self.set_platform_and_arch()
         self.set_python_version()
 
-        pdb.set_trace()
         if self.platform == 'Windows':
             matlab_root = self.get_matlab_root_from_windows_reg()
         else:
@@ -396,7 +406,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.13.3a8",
+        version="9.13.3a9",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
