@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2023b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.15.1a3'
+    MATLAB_VER = '9.15.1a4'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10'])
@@ -53,7 +53,7 @@ class _MatlabFinder(build_py):
     found_matlab_version = ''
     found_matlab_with_wrong_arch_in_default_install = ''
     found_matlab_with_wrong_arch_in_path = ''
-    verbose = False
+    verbose = True
     
     # ERROR MESSAGES
     minimum_maximum = "No compatible version of MATLAB was found. " + \
@@ -331,12 +331,14 @@ class _MatlabFinder(build_py):
     def _err_msg_if_bad_matlab_root(self, matlab_root):
         if not matlab_root:
             if self.found_matlab_version:
+                _print_if_verbose(f'self.found_matlab_version: {self.found_matlab_version}; self.VER_TO_REL: {self.VER_TO_REL}')
                 if self.found_matlab_version in self.VER_TO_REL:
                     return self.incompatible_ver.format(ver=self.found_matlab_version, rel=self.found_matlab_release)
                 # Found a MATLAB release but it is older than the oldest version supported,
                 # or newer than the newest version supported.
                 else:
                     v_to_r_keys = list(self.VER_TO_REL.keys())
+                    _print_if_verbose(f'v_to_r_keys: {v_to_r_keys}')
                     min_v = v_to_r_keys[0]
                     min_r = self.VER_TO_REL[min_v]
                     max_v = v_to_r_keys[-1]
@@ -412,7 +414,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.15.1a3",
+        version="9.15.1a4",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
