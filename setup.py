@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2023a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.14.1a2'
+    MATLAB_VER = '9.14.1a3'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.8', '3.9', '3.10'])
@@ -277,7 +277,7 @@ class _MatlabFinder(build_py):
         matlab_ver_match = re.match(re_major_minor, matlab_ver)
         if not matlab_ver_match:
             raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
-        eng_major_minor = self._get_engine_ver_major_minor()
+        eng_major_minor = self._get_engine_ver_major_minor(matlab_ver)
         matlab_ver_major_minor = (matlab_ver_match.group(1), matlab_ver_match.group(2))
         return (matlab_ver_major_minor == eng_major_minor)
     
@@ -414,7 +414,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.14.1a2",
+        version="9.14.1a3",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="MathWorks XSLA License",
