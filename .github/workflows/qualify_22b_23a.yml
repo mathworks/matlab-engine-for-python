@@ -1,0 +1,41 @@
+# Run tInstall on Ubuntu against python versions 3.10, 3.9 and 3.8
+
+name: Test R2022b and R2023a
+
+on:
+  push:
+    branches:
+      - R2022b
+      - R2023a
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test-python-engine:
+    strategy:
+      matrix:
+        python: ["3.10", "3.9", "3.8"]
+        matlab: [R2022b, R2023a]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v3.1.3
+        with:
+           python-version: ${{ matrix.python }}
+      
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1
+        with:
+           release: ${{ matrix.matlab }}
+
+      - uses: actions/checkout@v3
+
+      - name: Run tests
+        uses: matlab-actions/run-tests@v1
