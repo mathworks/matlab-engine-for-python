@@ -24,10 +24,10 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2023b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '9.15.1a10'
+    MATLAB_VER = '9.15.1a11'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10'])
+    SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11'])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
@@ -415,10 +415,10 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="9.15.1a10",
+        version="9.15.1a11",
         description='A module to call MATLAB from Python',
         author='MathWorks',
-        license="MathWorks XSLA License",
+        license="LICENSE.txt, located in this repository",
         url='https://github.com/mathworks/matlab-engine-for-python/',
         long_description=long_description,
         long_description_content_type="text/markdown",

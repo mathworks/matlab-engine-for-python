@@ -10,7 +10,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 
 ### Required 3rd Party Products
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
-* Python 3.9 or 3.10
+* Python 3.9, 3.10, or 3.11
     * Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/python-compatibility.pdf).
 
 ---
@@ -21,7 +21,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.15.1a10
+$ python -m pip install matlabengine==9.15.1a11
 ```
 
 
@@ -46,7 +46,7 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:<matlabroot>/bin/glnxa64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.15.1a10
+$ python -m pip install matlabengine==9.15.1a11
 ```
 
 ### macOS
@@ -70,7 +70,7 @@ setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:<matlabroot>/bin/maci64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.15.1a10
+$ python -m pip install matlabengine==9.15.1a11
 ```
 
 ---
@@ -122,7 +122,7 @@ See [Troubleshoot MATLAB Errors in Python](https://www.mathworks.com/help/matlab
 ---
 
 ## License
-This software is licensed under the MathWorks XSLA License, which is available in the LICENSE.txt file within this repository.
+The license is available in the LICENSE.txt file within this repository.
 
 ---
 
