@@ -5,7 +5,7 @@ classdef tInstall < matlab.unittest.TestCase
 
     properties (Constant)
         MATLABVersion = string(ver('MATLAB').Version) % Example: 9.14
-        MATLABRelease = erase(ver('MATLAB').Release,{'(',')'}) % Example: R2023a
+        MATLABRelease = erase(ver('MATLAB').Release,{'(',')'}) % Example: (R2023a) -> R2023a
     end
 
     methods (Test)
