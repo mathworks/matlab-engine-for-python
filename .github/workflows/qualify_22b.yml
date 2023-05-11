@@ -1,13 +1,14 @@
 # Run tInstall on Ubuntu against python versions 3.10, 3.9 and 3.8
 
-name: Test R2022b and R2023a
-
+name: Test R2022b
 on:
   push:
     branches:
       - R2022b
-      - R2023a
-      - main
+
+  pull_request:
+    branches:
+      - R2022b
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -20,7 +21,6 @@ jobs:
     strategy:
       matrix:
         python: ["3.10", "3.9", "3.8"]
-        matlab: [R2022b, R2023a]
     
     runs-on: ubuntu-latest
 
@@ -33,7 +33,7 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1
         with:
-           release: ${{ matrix.matlab }}
+           release: R2022b
 
       - uses: actions/checkout@v3
 
