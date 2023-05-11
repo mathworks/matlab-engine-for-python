@@ -10,12 +10,14 @@ classdef tInstall < matlab.unittest.TestCase
     methods (Test)
         function installNoVersionSpecified(testCase)
             [status, out] = system("pip install matlabengine");
+            addTeardown(testCase, @system, "pip uninstall -y matlabengine");
             verifyEqual(testCase, status, 0, out)
             verifyInstallation(testCase)
         end
 
         function installMatchingEngine(testCase)
             [status, out] = system("pip install matlabengine==" + testCase.MATLABVersion + ".*");
+            addTeardown(testCase, @system, "pip uninstall -y matlabengine");
             verifyEqual(testCase, status, 0, out)
             verifyInstallation(testCase)
         end
@@ -32,7 +34,6 @@ classdef tInstall < matlab.unittest.TestCase
             end
             pySharedEngineName = char(py.matlab.engine.find_matlab());
             verifySubstring(testCase, pySharedEngineName, sharedEngineName)
-            system("pip uninstall -y matlabengine");
         end
     end
 end
