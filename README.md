@@ -11,7 +11,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 ### Required 3rd Party Products
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 * Python 3.8, 3.9, or 3.10
-    * Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/python-compatibility.pdf).
+    * Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/support/requirements/python-compatibility.html).
 
 ---
 
