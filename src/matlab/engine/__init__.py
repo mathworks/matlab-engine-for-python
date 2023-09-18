@@ -28,7 +28,7 @@ import threading
 
 # UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
 # when support for a Python version must be added or removed
-_supported_versions = ['2_7', '3_8', '3_9', '3_10']
+_supported_versions = ['3_9', '3_10', '3_11']
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
 _PYTHONVERSION = None
@@ -64,8 +64,7 @@ if firstExceptionMessage:
                 os.environ[_envs[_arch]] = _bin_dir + os.pathsep + os.environ[_envs[_arch]]
             else:
                 os.environ[_envs[_arch]] = _bin_dir
-            if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
-                os.add_dll_directory(_bin_dir)
+            os.add_dll_directory(_bin_dir)
         pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
     except Exception as secondE:
         str1 = 'Please reinstall MATLAB Engine for Python or contact '
