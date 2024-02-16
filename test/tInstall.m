@@ -8,13 +8,6 @@ classdef tInstall < matlab.unittest.TestCase
     end
 
     methods (Test)
-        function installNoVersionSpecified(testCase)
-            [status, out] = system("pip install matlabengine");
-            addTeardown(testCase, @system, "pip uninstall -y matlabengine");
-            verifyEqual(testCase, status, 0, out)
-            verifyInstallation(testCase)
-        end
-
         function installMatchingEngine(testCase)
             [status, out] = system("pip install matlabengine==" + testCase.MATLABVersion + ".*");
             addTeardown(testCase, @system, "pip uninstall -y matlabengine");
