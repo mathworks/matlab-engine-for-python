@@ -11,13 +11,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 ### Required 3rd Party Products
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 * Python 3.8, 3.9, or 3.10
-<<<<<<< HEAD
     * Supported Python versions by MATLAB release can be found [here](https://mathworks.com/support/requirements/python-compatibility.html).
-=======
-    * Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/support/requirements/python-compatibility.html).
->>>>>>> 6fbf1c78f02910e71ce14f3a49f20a634f653509
-
----
 
 ## Install
 
@@ -25,7 +19,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.14.5
+$ python -m pip install matlabengine==9.14.6
 ```
 
 
@@ -50,7 +44,7 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:<matlabroot>/bin/glnxa64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.14.5
+$ python -m pip install matlabengine==9.14.6
 ```
 
 ### macOS
@@ -74,7 +68,7 @@ setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:<matlabroot>/bin/maci64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==9.14.5
+$ python -m pip install matlabengine==9.14.6
 ```
 
 ---
