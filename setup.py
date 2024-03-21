@@ -1,4 +1,4 @@
-# Copyright 2022-2023 Mathworks, Inc.
+# Copyright 2024 Mathworks, Inc.
 
 from setuptools import setup, find_packages
 from setuptools.command.build_py import build_py 
@@ -21,10 +21,10 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2023b'
+    MATLAB_REL = 'R2024a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '23.2.3'
+    MATLAB_VER = '24.1.1'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11'])
@@ -37,7 +37,8 @@ class _MatlabFinder(build_py):
         "9.12": "R2022a",
         "9.13": "R2022b",
         "9.14": "R2023a",
-        "23.2": "R2023b"
+        "23.2": "R2023b",
+        "24.1": "R2024a"
     }
 
     DEFAULT_INSTALLS = {
@@ -415,7 +416,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="23.2.3",
+        version="24.1.1",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
