@@ -16,11 +16,6 @@ from matlab.engine import pythonengine
 from matlab.engine import MatlabFuture
 from matlab.engine import FevalFuture
 
-try:
-    long
-except NameError:
-    long = int
-
 class FutureResult():
     """
     A FutureResult object is used to hold the future result of a function call.
@@ -58,7 +53,7 @@ class FutureResult():
             RejectedExecutionError  - an error occurs if the engine is terminated.
         """
         if timeout is not None:
-            if not isinstance(timeout, (int, long, float)):
+            if not isinstance(timeout, (int, float)):
                 raise TypeError(pythonengine.getMessage('TimeoutMustBeNumeric', type(timeout).__name__))
             
             if timeout < 0:

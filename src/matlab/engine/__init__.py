@@ -1,4 +1,4 @@
-#Copyright 2014-2022 MathWorks, Inc.
+#Copyright 2014-2023 MathWorks, Inc.
 
 """
 The MATLAB Engine enables you to call any MATLAB statement either synchronously
@@ -44,7 +44,10 @@ success = False
 firstExceptionMessage = ''
 secondExceptionMessage = ''
 try:
-    pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
+    if _PYTHONVERSION != '3_9' and _PYTHONVERSION != '3_10':
+        pythonengine = importlib.import_module("matlabengineforpython_abi3")
+    else:
+        pythonengine = importlib.import_module("matlabengineforpython" + _PYTHONVERSION)
 except Exception as firstE:
     firstExceptionMessage = str(firstE)
 
@@ -65,7 +68,10 @@ if firstExceptionMessage:
             else:
                 os.environ[_envs[_arch]] = _bin_dir
             os.add_dll_directory(_bin_dir)
-        pythonengine = importlib.import_module("matlabengineforpython"+_PYTHONVERSION)
+        if _PYTHONVERSION != '3_9' or _PYTHONVERSION != '3_10':
+            pythonengine = importlib.import_module("matlabengineforpython_abi3")
+        else:
+            pythonengine = importlib.import_module("matlabengineforpython" + _PYTHONVERSION)
     except Exception as secondE:
         str1 = 'Please reinstall MATLAB Engine for Python or contact '
         str2 = 'MathWorks Technical Support for assistance:\nFirst issue: {}\nSecond issue: {}'.format(
@@ -106,9 +112,8 @@ def start_matlab(option="-nodesktop", **kwargs):
     
     Parameters
         option - MATLAB startup option.
-        async, background: bool - start MATLAB asynchronously or not.  This parameter
-        is optional and false by default.  "async" is a synonym for "background"
-        that will be removed in a future release.
+        background: bool - start MATLAB asynchronously or not.  This parameter
+        is optional and false by default.
                 
     Returns
         MatlabEngine - if aync or background is false.  This object can be used to evaluate

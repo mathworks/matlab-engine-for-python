@@ -19,12 +19,6 @@ from matlab.engine import BaseFuture
 import time
 import weakref
 
-try:
-    long
-except NameError:
-    long = int
-
-
 class FevalFuture(BaseFuture):
     """
     A FevalFuture object is used to hold the future result of a MATLAB
