@@ -40,8 +40,8 @@ class _MatlabFinder(build_py):
     }
 
     DEFAULT_INSTALLS = {
-        'Darwin': f"/Applications/MATLAB_{MATLAB_REL}.app",
-        'Linux': f"/usr/local/MATLAB/{MATLAB_REL}"
+        'Darwin': f"{os.getenv('MATLAB_HOME', '/Applications')}/MATLAB_{MATLAB_REL}.app",
+        'Linux': f"{os.getenv('MATLAB_HOME', '/usr/local')}/MATLAB/{MATLAB_REL}"
     }
 
     arch = ''
