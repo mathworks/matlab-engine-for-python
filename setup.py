@@ -10,6 +10,13 @@ import xml.etree.ElementTree as xml
 if platform.system() == 'Windows':
     import winreg
 
+def is_configure_root() -> bool:
+    """
+    Returns True if matlab folders should be configured at build time
+    """
+    return os.environ.get('MATLAB_ENGINE_CONFIGURE_ROOT', 'true').lower() in ('true', '1')
+
+
 class _MatlabFinder(build_py):
     """
     Private class that finds MATLAB on user's computer prior to package installation.
@@ -379,34 +386,36 @@ class _MatlabFinder(build_py):
         self.set_platform_and_arch()
         self.set_python_version()
 
-        if self.platform == 'Windows':
-            matlab_root = self.get_matlab_root_from_windows_reg()
-        else:
-            if self.unix_default_install_exists():
-                matlab_root = self.DEFAULT_INSTALLS[self.platform]
+        if is_configure_root():
+            if self.platform == 'Windows':
+                matlab_root = self.get_matlab_root_from_windows_reg()
             else:
-                path_dirs = self._create_path_list()
-                matlab_root = self.search_path_for_directory_unix(self.arch, path_dirs)
-            err_msg = self._err_msg_if_bad_matlab_root(matlab_root)
-            if err_msg:
-                if self.platform == 'Darwin':
-                    if self.found_matlab_with_wrong_arch_in_default_install:
-                        raise RuntimeError(
-                            self.wrong_arch_in_default_install.format(
-                                path1=self.found_matlab_with_wrong_arch_in_default_install,
-                                matlab_arch=self._get_alternate_arch(),
-                                python_arch=self.arch,
-                                next_steps=self.next_steps))
-                    if self.found_matlab_with_wrong_arch_in_path:
-                        raise RuntimeError(
-                            self.wrong_arch_in_path.format(
-                                path1=self.found_matlab_with_wrong_arch_in_path,
-                                matlab_arch=self._get_alternate_arch(),
-                                python_arch=self.arch,
-                                next_steps=self.next_steps))
-                raise RuntimeError(err_msg)
+                if self.unix_default_install_exists():
+                    matlab_root = self.DEFAULT_INSTALLS[self.platform]
+                else:
+                    path_dirs = self._create_path_list()
+                    matlab_root = self.search_path_for_directory_unix(self.arch, path_dirs)
+                err_msg = self._err_msg_if_bad_matlab_root(matlab_root)
+                if err_msg:
+                    if self.platform == 'Darwin':
+                        if self.found_matlab_with_wrong_arch_in_default_install:
+                            raise RuntimeError(
+                                self.wrong_arch_in_default_install.format(
+                                    path1=self.found_matlab_with_wrong_arch_in_default_install,
+                                    matlab_arch=self._get_alternate_arch(),
+                                    python_arch=self.arch,
+                                    next_steps=self.next_steps))
+                        if self.found_matlab_with_wrong_arch_in_path:
+                            raise RuntimeError(
+                                self.wrong_arch_in_path.format(
+                                    path1=self.found_matlab_with_wrong_arch_in_path,
+                                    matlab_arch=self._get_alternate_arch(),
+                                    python_arch=self.arch,
+                                    next_steps=self.next_steps))
+                    raise RuntimeError(err_msg)
 
-        self.write_text_file(matlab_root)
+            self.write_text_file(matlab_root)
+
         build_py.run(self)
 
 
@@ -427,7 +436,7 @@ if __name__ == '__main__':
         package_dir={'': 'src'},
         packages=find_packages(where="src"),
         cmdclass={'build_py': _MatlabFinder},
-        package_data={'': ['_arch.txt']},
+        package_data={'': ['_arch.txt']} if is_configure_root() else {},
         zip_safe=False,
         project_urls={
             'Documentation': 'https://www.mathworks.com/help/matlab/matlab-engine-for-python.html',
