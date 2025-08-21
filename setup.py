@@ -268,7 +268,7 @@ class _MatlabFinder(build_py):
         return key_value       
 
     def _get_engine_ver_major_minor(self, id):
-        re_major_minor = "^(\d+)\.(\d+)"
+        re_major_minor = r"^(\d+)\.(\d+)"
         eng_match = re.match(re_major_minor, id)
         if not eng_match:
             raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
@@ -277,7 +277,7 @@ class _MatlabFinder(build_py):
         return ret
         
     def _check_matlab_ver_against_engine(self, matlab_ver):
-        re_major_minor = "^(\d+)\.(\d+)"
+        re_major_minor = r"^(\d+)\.(\d+)"
         matlab_ver_match = re.match(re_major_minor, matlab_ver)
         if not matlab_ver_match:
             raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
