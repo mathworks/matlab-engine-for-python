@@ -4,6 +4,7 @@ import os
 import platform
 import sys
 import pkgutil
+from . import _utils
 
 __path__ = pkgutil.extend_path(__path__, __name__)
 package_folder = os.path.dirname(os.path.realpath(__file__))
@@ -35,13 +36,7 @@ def add_dirs_to_path(bin_dir, engine_dir, extern_dir):
         sys.path.insert(0, engine_dir)
         sys.path.insert(0, extern_dir)
 
-arch_file = os.path.join(package_folder, 'engine', '_arch.txt')
-if not os.path.isfile(arch_file):
-    raise RuntimeError("The MATLAB Engine for Python install is corrupted. Please try to re-install.")
-
-with open(arch_file, 'r') as root:
-    [arch, bin_folder, engine_folder, extern_bin] = [line.strip() for line in root.readlines()]
-
+arch, bin_folder, engine_folder, extern_bin = _utils.get_path_info()
 
 add_dirs_to_path(bin_folder, engine_folder, extern_bin)
 
