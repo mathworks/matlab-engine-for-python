@@ -21,13 +21,13 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2025b'
+    MATLAB_REL = 'R2026a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '25.2.2'
+    MATLAB_VER = '26.1.1'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11', '3.12'])
+    SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11', '3.12', '3.13'])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
@@ -41,7 +41,8 @@ class _MatlabFinder(build_py):
         "24.1": "R2024a",
         "24.2": "R2024b",
         "25.1": "R2025a",
-        "25.2": "R2025b"
+        "25.2": "R2025b",
+        "26.1": "R2026a"
     }
 
     DEFAULT_INSTALLS = {
@@ -419,7 +420,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="25.2.2",
+        version="26.1.1",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
@@ -447,8 +448,9 @@ if __name__ == '__main__':
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
-            "Programming Language :: Python :: 3.12"
+            "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13"
         ],
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        python_requires=">=3.9, <3.13"
+        python_requires=">=3.9, <3.14"
     )

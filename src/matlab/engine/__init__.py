@@ -1,4 +1,4 @@
-#Copyright 2014-2024 MathWorks, Inc.
+#Copyright 2014-2025 MathWorks, Inc.
 
 """
 The MATLAB Engine enables you to call any MATLAB statement either synchronously
@@ -30,10 +30,10 @@ import warnings
 # UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
 # when support for a Python version must be added or removed
 
-_supported_versions = ['3_9', '3_10', '3_11', '3_12']
+_supported_versions = ['3_9', '3_10', '3_11', '3_12', '3_13']
 _ver = sys.version_info
 _version = '{0}_{1}'.format(_ver[0], _ver[1])
-_newer_than_supported = _ver[1] > 12
+_newer_than_supported = _ver[1] > 13
 
 _PYTHONVERSION = None
 
@@ -41,12 +41,12 @@ if _version in _supported_versions:
     _PYTHONVERSION = _version
 elif _newer_than_supported:
     warnings.warn('MATLAB Engine for Python supports Python version'
-                    ' 3.9, 3.10, 3.11, and 3.12, but your version of Python '
+                    ' 3.9, 3.10, 3.11, 3.12, and 3.13, but your version of Python '
                     'is %s' % _version)
-    _PYTHONVERSION = _version  
+    _PYTHONVERSION = _version
 else:
     raise EnvironmentError('MATLAB Engine for Python supports Python version'
-                        ' 3.9, 3.10, 3.11, and 3.12, but your version of Python '
+                        ' 3.9, 3.10, 3.11, 3.12, and 3.13, but your version of Python '
                         'is %s' % _version)
 
 

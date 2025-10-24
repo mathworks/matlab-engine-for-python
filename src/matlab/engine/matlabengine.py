@@ -1,4 +1,4 @@
-#Copyright 2014-2017 MathWorks, Inc.
+#Copyright 2014-2025 MathWorks, Inc.
 
 """
 MatlabEngine: The class name of MATLAB Engine.  You can call MATLAB software as
@@ -126,11 +126,15 @@ class MatlabWorkSpace(object):
        
         _method=MatlabFunc(self._engine(), "assignin")
         return  _method("base", attr, value, nargout=0)
-        
+
+    def __str__(self):
+        return self.__repr__()
+
     def __repr__(self):
-        _method = MatlabFunc(self._engine(), "whos")
-        _method(nargout=0)
-        return ""
+        # 'evalc' evaluates a MATLAB expression, redirecting stdout to a variable. 
+        # Here, we use it to redirect the stdout of 'whos' to a string.
+        _evalcMethodHandle = MatlabFunc(self._engine(), "evalc")
+        return _evalcMethodHandle('whos')
 
     def __setattr__(self, kw, value):
         raise AttributeError(pythonengine.getMessage('AttrCannotBeAddedToMWS'))

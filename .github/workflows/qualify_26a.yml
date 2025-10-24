@@ -1,15 +1,15 @@
 # Run tInstall on Ubuntu against python versions 3.12, 3.11, 3.10 and 3.9
 # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-name: Test R2025b
+name: Test R2026a
 
 on:
   push:
     branches:
-      - R2025b
+      - R2026a
 
   pull_request:
     branches:
-      - R2025b
+      - R2026a
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
   test-python-engine:
     strategy:
       matrix:
-        python: ["3.12", "3.11", "3.10", "3.9"]
+        python: ["3.13", "3.12", "3.11", "3.10", "3.9"]
 
     runs-on: ubuntu-latest
 
@@ -34,7 +34,7 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
-           release: R2025b
+           release: R2026a
 
       - uses: actions/checkout@v3
 
