@@ -125,8 +125,6 @@ class _MiniPathInitializer(object):
         dir_to_search = os.path.join('runtime', self.arch)
         trailing_substrings_to_find = [dir_to_search, dir_to_search + os.sep]
 
-        # First, look for a path ending with "runtime/<arch>". If found, use it
-        # to find a path ending with "extern/bin/<arch>".
         extern_bin_dir = ''
         for elem in path_elements:
             for trailing_substring in trailing_substrings_to_find:
@@ -135,19 +133,6 @@ class _MiniPathInitializer(object):
                     if extern_bin_dir:
                         break
 
-        if not extern_bin_dir:
-            # Look for a path ending with "extern/bin/<arch>".
-            dir_to_search = os.path.join('extern', 'bin', self.arch)
-            trailing_substrings_to_find = [dir_to_search, dir_to_search + os.sep]
-
-            extern_bin_dir = ''
-            for elem in path_elements:
-                for trailing_substring in trailing_substrings_to_find:
-                    if elem.endswith(trailing_substring):
-                        extern_bin_dir = elem
-                        if extern_bin_dir:
-                            break
-            
         if not extern_bin_dir:
             format_str = 'Could not find an appropriate directory in {0} from which to read binaries. Details::\n{1}'
             raise RuntimeError(format_str.format(self.path_var, path_elements_orig))
@@ -187,13 +172,6 @@ def add_dll_dir_on_win(arch, dir_to_add):
         if not dir_to_add:
             raise RuntimeError('Cannot add empty DLL directory')
         os.add_dll_directory(dir_to_add)
-        
-        # For the case of Windows, we also need to add the bin/win64 folder to the PATH
-        if 'PATH' in os.environ:
-            _env = os.environ['PATH']
-            os.environ['PATH'] = dir_to_add + os.pathsep + _env
-        else:
-            os.environ['PATH'] = dir_to_add
     
 def get_dirs_from_arch_file_without_import():
     _PYTHONVERSION = get_python_version()
@@ -229,23 +207,14 @@ extern_bin_dir = ''
 if subdir_exists(_package_folder, 'engine'):
     success = get_dirs_from_arch_file_without_import()
     if not success:
-        # Use the location of this file (already stored in _package_folder) to construct _bin_dir, _engine_dir, and _extern_bin_dir, 
-        # so that they are added to the Python sys.path and the OS path environment variable as necessary.
-            
-        #Use _package_folder <matlabroot>\extern\engines\python\dist\matlab to derive <matlabroot>\bin\win64
-        #<matlabroot>\extern\engines\python\dist\matlab\..\..\..\..\..\bin\win64
-        _bin_dir = os.path.join(_package_folder, '..', '..', '..', '..' ,'..', 'bin', _mpi.arch) 
-
-        if os.path.exists(_bin_dir):
-            add_dll_dir_on_win(_mpi.arch, _bin_dir)
-                
-            #Use _package_folder <matlabroot>\extern\engines\python\dist\matlab to derive <matlabroot>\extern\engines\python\dist\matlab\engine\win64
-            _engine_dir = os.path.join(_package_folder, 'engine', _mpi.arch)
-            sys.path.insert(0,_engine_dir)
-    
-            #Use _bin_dir <matlabroot>\bin\win64 to derive <matlabroot>\extern\bin\win64
-            _extern_bin_dir = os.path.join(_bin_dir, '..', '..', 'extern', 'bin', _mpi.arch)
-            sys.path.insert(0,_extern_bin_dir)
+        if 'MWE_INSTALL' in os.environ:
+            mroot_from_env_var = os.environ['MWE_INSTALL']
+            extern_bin_dir = os.path.join(mroot_from_env_var, 'extern', 'bin', _mpi.arch)
+            if not os.path.exists(extern_bin_dir):
+                raise RuntimeError('directory {} does not exist'.format(extern_bin_dir))
+            sys.path.insert(0, extern_bin_dir)
+            bin_dir = extern_bin_dir.replace('extern' + os.sep + 'bin', 'bin')
+            add_dll_dir_on_win(_mpi.arch, bin_dir)
         else:
             raise RuntimeError('unable to read {}'.format(get_arch_filename()))
 else:
