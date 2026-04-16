@@ -33,6 +33,8 @@ jobs:
         user: __token__
         password: ${{ secrets.MATLABENGINE_TEST_PYPI_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
+        verbose: true
+        skip-existing: true
         
     - name: Publish package to PyPI since the "prerelease" checkbox is unchecked
       if: "!github.event.release.prerelease"
