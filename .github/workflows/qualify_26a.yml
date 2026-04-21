@@ -6,8 +6,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab as long as it's on the main branch
   workflow_dispatch:
 
-
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   test-python-engine:
