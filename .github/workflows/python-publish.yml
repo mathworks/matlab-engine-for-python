@@ -42,3 +42,5 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.MATLABENGINE_PYPI_TOKEN }}
+        verbose: true
+        skip-existing: true

@@ -1,17 +1,9 @@
-# Run tInstall on Ubuntu against python versions 3.12, 3.11, 3.10 and 3.9
+# Run tInstall on Ubuntu against supported Python versions
 # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
 name: Test R2026a
 
 on:
-  push:
-    branches:
-      - R2026a
-
-  pull_request:
-    branches:
-      - R2026a
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab as long as it's on the main branch
   workflow_dispatch:
 
 
