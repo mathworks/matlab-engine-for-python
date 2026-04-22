@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2026a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.1.9'
+    MATLAB_VER = '26.1.10'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11', '3.12', '3.13'])
@@ -58,7 +58,7 @@ class _MatlabFinder(build_py):
     found_matlab_version = ''
     found_matlab_with_wrong_arch_in_default_install = ''
     found_matlab_with_wrong_arch_in_path = ''
-    verbose = False
+    verbose = True
     
     # ERROR MESSAGES
     minimum_maximum = "No compatible version of MATLAB was found. " + \
@@ -105,6 +105,8 @@ class _MatlabFinder(build_py):
                 self.arch = 'maci64'
         else:
             raise RuntimeError(self.unsupported_platform.format(platform=self.platform))
+        
+        self._print_if_verbose(f'{self.platform=}; {self.path_env_var_name=}; {self.arch=}')
     
     def set_python_version(self):
         """
@@ -115,12 +117,16 @@ class _MatlabFinder(build_py):
 
         if self.python_ver not in self.SUPPORTED_PYTHON_VERSIONS:
             raise RuntimeError(self.unsupported_python.format(python=self.python_ver, supported=str(self.SUPPORTED_PYTHON_VERSIONS)))
+            
+        self._print_if_verbose(f'{self.python_ver=}')
 
     def unix_default_install_exists(self):
         """
         Determines whether MATLAB is installed in default UNIX location.
         """
         path = self.DEFAULT_INSTALLS[self.platform]
+        self._print_if_verbose(f'From unix_default_install_exists: {self.platform=}; {path=}')
+        self._print_if_verbose(f'{os.path.exists(path)=}')
         if not os.path.exists(path):
             return False
         
@@ -128,6 +134,8 @@ class _MatlabFinder(build_py):
             # On Mac, we need to further verify that there is a 'bin/maci64' subdir if the Python is maci64
             # or a 'bin/maca64' subdir if the Python is maca64.
             path_to_bin = os.path.join(path, 'bin', self.arch)
+            self._print_if_verbose(f'From unix_default_install_exists: {path_to_bin=}')
+            self._print_if_verbose(f'{os.path.exists(path_to_bin)=}')
             if os.path.exists(path_to_bin):
                 # The path exists, and we don't need to do anything further.
                 return True
@@ -144,6 +152,7 @@ class _MatlabFinder(build_py):
                 # location that has the wrong arch. The user can choose whether to change the
                 # Python interpreter or the MATLAB installation so that the arch will match.
                 self.found_matlab_with_wrong_arch_in_default_install = path
+                self._print_if_verbose(f'{self.found_matlab_with_wrong_arch_in_default_install}')
                 return False
                 
         return True
@@ -157,6 +166,7 @@ class _MatlabFinder(build_py):
         if self.path_env_var_name in os.environ:
             path_string = os.environ[self.path_env_var_name]
             path_dirs.extend(path_string.split(os.pathsep))
+        self._print_if_verbose(f'{path_dirs=}')
         
         if not path_dirs:
             raise RuntimeError(self.install_or_set_path.format(
@@ -285,6 +295,7 @@ class _MatlabFinder(build_py):
             raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
         eng_major_minor = self._get_engine_ver_major_minor(self.MATLAB_VER)
         matlab_ver_major_minor = (matlab_ver_match.group(1), matlab_ver_match.group(2))
+        self._print_if_verbose(f'{matlab_ver_major_minor=}; {eng_major_minor=}')
         return (matlab_ver_major_minor == eng_major_minor)
     
     def verify_matlab_release(self, root):
@@ -306,6 +317,7 @@ class _MatlabFinder(build_py):
             elif child.tag == 'version':
                 major, minor = self._get_engine_ver_major_minor(child.text)
                 self.found_matlab_version = f'{major}.{minor}'
+        self._print_if_verbose(f'{matlab_release=}; {self.MATLAB_REL=}')
         return matlab_release == self.MATLAB_REL
 
     def search_path_for_directory_unix(self, arch, path_dirs):
@@ -374,6 +386,7 @@ class _MatlabFinder(build_py):
             root_file.write(bin_arch + '\n')
             root_file.write(engine_arch + '\n')
             root_file.write(extern_bin)
+        self._print_if_verbose(f'{file_location=}; {bin_arch=}; {engine_arch=}; {extern_bin=}')
 
     def run(self):
         """
@@ -422,7 +435,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.1.9",
+        version="26.1.10",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
