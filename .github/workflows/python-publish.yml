@@ -24,7 +24,7 @@ jobs:
         python -m pip install setuptools twine
  
     - name: Build package
-      run: python -m build
+      run: python -m build --sdist
       
     - name: Publish package to TestPyPI since the "prerelease" checkbox is checked
       if: "github.event.release.prerelease"

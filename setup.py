@@ -24,7 +24,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2026a'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.1.10'
+    MATLAB_VER = '26.1.11'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11', '3.12', '3.13'])
@@ -420,9 +420,7 @@ class _MatlabFinder(build_py):
                                 matlab_arch=self._get_alternate_arch(),
                                 python_arch=self.arch,
                                 next_steps=self.next_steps))
-                print(err_msg)
-                return
-                #raise RuntimeError(err_msg)
+                raise RuntimeError(err_msg)
 
         self.write_text_file(matlab_root)
         build_py.run(self)
@@ -435,7 +433,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.1.10",
+        version="26.1.11",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
