@@ -21,13 +21,13 @@ class _MatlabFinder(build_py):
     }
     
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_REL = 'R2026a'
+    MATLAB_REL = 'R2026b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.1.12'
+    MATLAB_VER = '26.2.1'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    SUPPORTED_PYTHON_VERSIONS = set(['3.9', '3.10', '3.11', '3.12', '3.13'])
+    SUPPORTED_PYTHON_VERSIONS = set(['3.10', '3.11', '3.12', '3.13', '3.14'])
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     VER_TO_REL = {
@@ -42,7 +42,8 @@ class _MatlabFinder(build_py):
         "24.2": "R2024b",
         "25.1": "R2025a",
         "25.2": "R2025b",
-        "26.1": "R2026a"
+        "26.1": "R2026a",
+        "26.2": "R2026b"
     }
 
     DEFAULT_INSTALLS = {
@@ -61,7 +62,7 @@ class _MatlabFinder(build_py):
     verbose = False
     
     # ERROR MESSAGES
-    minimum_maximum = "No compatible version of MATLAB was found. " + \
+    minimum_maximum_matlab = "No compatible version of MATLAB was found. " + \
         "Version {this_v:s} was found, but this feature only supports MATLAB {min_v:s} ({min_r:s}) through {max_v:s} ({max_r:s}), inclusive."
     dir_not_found = "Directory not found: "
     no_windows_install = "MATLAB installation not found in Windows Registry:"
@@ -280,7 +281,7 @@ class _MatlabFinder(build_py):
         return key_value       
 
     def _get_engine_ver_major_minor(self, id):
-        re_major_minor = "^(\d+)\.(\d+)"
+        re_major_minor = r"^(\d+)\.(\d+)"
         eng_match = re.match(re_major_minor, id)
         if not eng_match:
             raise RuntimeError(f"{self.invalid_version_from_eng.format(ver=self.MATLAB_VER)}")
@@ -289,7 +290,7 @@ class _MatlabFinder(build_py):
         return ret
         
     def _check_matlab_ver_against_engine(self, matlab_ver):
-        re_major_minor = "^(\d+)\.(\d+)"
+        re_major_minor = r"^(\d+)\.(\d+)"
         matlab_ver_match = re.match(re_major_minor, matlab_ver)
         if not matlab_ver_match:
             raise RuntimeError(f"{self.invalid_version_from_matlab_ver.format(ver=matlab_ver)}")
@@ -361,7 +362,8 @@ class _MatlabFinder(build_py):
                     min_r = self.VER_TO_REL[min_v]
                     max_v = v_to_r_keys[-1]
                     max_r = self.VER_TO_REL[max_v]
-                    return self.minimum_maximum.format(this_v=self.found_matlab_release, min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
+                    return self.minimum_maximum_matlab.format(this_v=self.found_matlab_release,
+                        min_v=min_v, min_r=min_r, max_v=max_v, max_r=max_r)
             else:
                 # If we reach this line, we assume that the default location has already been checked for an
                 # appropriate MATLAB installation but none was found.
@@ -433,7 +435,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.1.12",
+        version="26.2.1",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",

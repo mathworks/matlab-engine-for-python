@@ -6,12 +6,9 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 ## Requirements
 ### Required MathWorks Products
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
-* MATLAB release R2026a
+* MATLAB release R2026b
 
-### Required 3rd Party Products
-<!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
-* Python 3.9, 3.10, 3.11, 3.12, or 3.13
-    * Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/support/requirements/python-compatibility.html).
+Supported Python versions by MATLAB release can be found [here](https://www.mathworks.com/support/requirements/python-compatibility.html).
 
 ---
 
@@ -21,7 +18,7 @@ The MATLAB&reg; Engine API for Python&reg; provides a package to integrate MATLA
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.1.12
+$ python -m pip install matlabengine==26.2.1
 ```
 
 
@@ -29,7 +26,7 @@ $ python -m pip install matlabengine==26.1.12
 ### Linux&reg; 
 Prior to installation, check the default install location of MATLAB by calling ```matlabroot``` in a MATLAB Command Window. By default, Linux installs MATLAB at:<br>
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
-```/usr/local/MATLAB/R2026a```
+```/usr/local/MATLAB/R2026b```
 
 When MATLAB is not installed in the default location, the bin/*architecture* directory within the MATLAB root directory must be added to the environment variable LD_LIBRARY_PATH. The path can be added to the environment variable within the shell startup configuration file (for example, .bashrc for bash shell or .tcshrc for tcsh).
 
@@ -46,7 +43,7 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:<matlabroot>/bin/glnxa64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.1.12
+$ python -m pip install matlabengine==26.2.1
 ```
 
 ### macOS
@@ -70,7 +67,7 @@ setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:<matlabroot>/bin/maci64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.1.12
+$ python -m pip install matlabengine==26.2.1
 ```
 
 ---
