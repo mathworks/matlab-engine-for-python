@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import platform
+import warnings
 import xml.etree.ElementTree as xml
 if platform.system() == 'Windows':
     import winreg
@@ -24,8 +25,11 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2026b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.2.1'
+    MATLAB_VER = '26.2.2'
 
+    # MUST_BE_CHECKED_EACH_RELEASE (Search repo for this string)
+    MAX_VALIDATED_MINOR_PY_VER = 14
+    
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
     SUPPORTED_PYTHON_VERSIONS = set(['3.10', '3.11', '3.12', '3.13', '3.14'])
 
@@ -68,6 +72,7 @@ class _MatlabFinder(build_py):
     no_windows_install = "MATLAB installation not found in Windows Registry:"
     unsupported_platform = "{platform:s} is not a supported platform."
     unsupported_python = "{python:s} is not supported. The supported Python versions are {supported:s}."
+    unvalidated_python = "Detected Python version {python:s} has not been validated with MATLAB Engine API for Python. To avoid unexpected behavior, use one of the validated Python versions: {supported:s}."
     unset_env = "Environment variable {path1:s} has not been set. Add <matlabroot>/bin/{arch:s} to {path2:s}, where <matlabroot> is the root of a valid MATLAB installation."
     install_or_set_path = "MATLAB {ver:s} installation not found. Install to default location, or add <matlabroot>/bin/{arch:s} to {path:s}, where <matlabroot> is the root of a MATLAB {ver:s} installation."
     no_compatible_matlab = "No compatible MATLAB installation found in Windows Registry. This release of " + \
@@ -117,7 +122,10 @@ class _MatlabFinder(build_py):
         self.python_ver = f"{ver.major}.{ver.minor}"
 
         if self.python_ver not in self.SUPPORTED_PYTHON_VERSIONS:
-            raise RuntimeError(self.unsupported_python.format(python=self.python_ver, supported=str(self.SUPPORTED_PYTHON_VERSIONS)))
+            if ver.minor > self.MAX_VALIDATED_MINOR_PY_VER:
+                warnings.warn(self.unvalidated_python.format(python=self.python_ver, supported=str(self.SUPPORTED_PYTHON_VERSIONS)))
+            else:
+                raise RuntimeError(self.unsupported_python.format(python=self.python_ver, supported=str(self.SUPPORTED_PYTHON_VERSIONS)))
             
         self._print_if_verbose(f'{self.python_ver=}')
 
@@ -435,7 +443,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.2.1",
+        version="26.2.2",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
@@ -460,12 +468,12 @@ if __name__ == '__main__':
             "Natural Language :: English",
             "Intended Audience :: Developers",
             # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-            "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
             "Programming Language :: Python :: 3.12",
-            "Programming Language :: Python :: 3.13"
+            "Programming Language :: Python :: 3.13",
+            "Programming Language :: Python :: 3.14"
         ],
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        python_requires=">=3.9, <3.14"
+        python_requires=">=3.10"
     )
