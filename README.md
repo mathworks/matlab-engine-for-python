@@ -18,7 +18,7 @@ Supported Python versions by MATLAB release can be found [here](https://www.math
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.2.2
+$ python -m pip install matlabengine==26.2.3
 ```
 
 
@@ -43,7 +43,7 @@ setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:<matlabroot>/bin/glnxa64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.2.2
+$ python -m pip install matlabengine==26.2.3
 ```
 
 ### macOS
@@ -67,7 +67,7 @@ setenv DYLD_LIBRARY_PATH ${DYLD_LIBRARY_PATH}:<matlabroot>/bin/maci64
 MATLAB Engine API for Python can be installed directly from the Python Package Index.
 <!-- MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string) -->
 ```bash
-$ python -m pip install matlabengine==26.2.2
+$ python -m pip install matlabengine==26.2.3
 ```
 
 ---

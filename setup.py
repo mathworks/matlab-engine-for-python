@@ -25,7 +25,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2026b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.2.2'
+    MATLAB_VER = '26.2.3'
 
     # MUST_BE_CHECKED_EACH_RELEASE (Search repo for this string)
     MAX_VALIDATED_MINOR_PY_VER = 14
@@ -103,12 +103,17 @@ class _MatlabFinder(build_py):
         if self.platform == 'Windows':
             self.arch = 'win64'
         elif self.platform == 'Linux':
-            self.arch = 'glnxa64'
+            is_arm64 = platform.machine().lower() in ("aarch64", "arm64")
+            if is_arm64:
+                self.arch = 'linux-arm-64'
+            else:
+                self.arch = 'glnxa64'
         elif self.platform == 'Darwin':
-            if platform.mac_ver()[-1] == 'arm64':
+            mac_ver = platform.mac_ver()[-1]
+            if mac_ver == 'arm64':
                 self.arch = 'maca64'
             else:
-                self.arch = 'maci64'
+                raise RuntimeError(f'unsupported version of macOS: {mac_ver}')
         else:
             raise RuntimeError(self.unsupported_platform.format(platform=self.platform))
         
@@ -140,28 +145,11 @@ class _MatlabFinder(build_py):
             return False
         
         if self.platform == 'Darwin':
-            # On Mac, we need to further verify that there is a 'bin/maci64' subdir if the Python is maci64
-            # or a 'bin/maca64' subdir if the Python is maca64.
+            # On Mac, we need to further verify that there is a 'bin/maca64' subdir.
             path_to_bin = os.path.join(path, 'bin', self.arch)
             self._print_if_verbose(f'From unix_default_install_exists: {path_to_bin=}')
             self._print_if_verbose(f'{os.path.exists(path_to_bin)=}')
-            if os.path.exists(path_to_bin):
-                # The path exists, and we don't need to do anything further.
-                return True
-                
-            if self.arch == 'maci64':
-                alternate_arch = 'maca64'
-            else:
-                alternate_arch = 'maci64'
-                
-            if os.path.exists(os.path.join(path, 'bin', alternate_arch)):
-                # There is a default install, but its arch doesn't match the Python arch. Save this info
-                # so that if we don't find an install with a valid arch in DYLD_LIBRARY_PATH, we can
-                # issue an error message that says that there is a Mac installation in the default 
-                # location that has the wrong arch. The user can choose whether to change the
-                # Python interpreter or the MATLAB installation so that the arch will match.
-                self.found_matlab_with_wrong_arch_in_default_install = path
-                self._print_if_verbose(f'{self.found_matlab_with_wrong_arch_in_default_install}')
+            if not os.path.exists(path_to_bin):
                 return False
                 
         return True
@@ -185,16 +173,9 @@ class _MatlabFinder(build_py):
         self._print_if_verbose(f'_create_path_list returned: {path_dirs}')
         return path_dirs
     
-    def _get_alternate_arch(self):
-        if self.arch == 'maci64':
-            return 'maca64'
-        if self.arch == 'maca64':
-            return 'maci64'
-        return self.arch
-
     def _arch_in_mac_dir_is_correct(self, dir):
-        ARCH_LEN = 6 # == len('maci64') or len('maca64')
-        BIN_ARCH_LEN = ARCH_LEN + 4 # == len('bin/maci64') or len('bin/maca64')
+        ARCH_LEN = 6 # == len('maca64')
+        BIN_ARCH_LEN = ARCH_LEN + 4 # == len('bin/maca64')
         
         if len(dir) < BIN_ARCH_LEN:
             return False
@@ -443,7 +424,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.2.2",
+        version="26.2.3",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",
