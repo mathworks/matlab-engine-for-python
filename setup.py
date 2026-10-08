@@ -25,7 +25,7 @@ class _MatlabFinder(build_py):
     MATLAB_REL = 'R2026b'
 
     # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-    MATLAB_VER = '26.2.4'
+    MATLAB_VER = '26.2.5'
 
     # MUST_BE_CHECKED_EACH_RELEASE (Search repo for this string)
     MAX_VALIDATED_MINOR_PY_VER = 14
@@ -424,7 +424,7 @@ if __name__ == '__main__':
     setup(
         name="matlabengine",
         # MUST_BE_UPDATED_EACH_RELEASE (Search repo for this string)
-        version="26.2.4",
+        version="26.2.5",
         description='A module to call MATLAB from Python',
         author='MathWorks',
         license="LICENSE.txt, located in this repository",

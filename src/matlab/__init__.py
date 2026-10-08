@@ -1,4 +1,4 @@
-# Copyright 2021-2025 MathWorks, Inc.
+# Copyright 2021-2026 MathWorks, Inc.
 """
 Array interface between Python and MATLAB
 
@@ -160,17 +160,17 @@ class _MiniPathInitializer(object):
 def get_python_version():
     # UPDATE_IF_PYTHON_VERSION_ADDED_OR_REMOVED : search for this string in codebase 
     # when support for a Python version must be added or removed
-    _supported_versions = ['3_9', '3_10', '3_11', '3_12', '3_13']
+    _supported_versions = ['3_10', '3_11', '3_12', '3_13', '3_14']
     _ver = sys.version_info
     _version = '{0}_{1}'.format(_ver[0], _ver[1])  
-    newer_than_supported = _ver[1] > 12  
+    newer_than_supported = _ver[1] > 14
 
     _PYTHONVERSION = None
 
     if _version in _supported_versions:
         _PYTHONVERSION = _version
     elif newer_than_supported:
-        warnings.warn('Python versions 3.9, 3.10, 3.11, 3.12, and 3.13 are supported, but your version of Python is %s' % _version)
+        warnings.warn('Python versions 3.10, 3.11, 3.12, 3.13, and 3.14 are supported, but your version of Python is %s' % _version)
         _PYTHONVERSION = _version  
     else:
         raise EnvironmentError("Python %s is not supported." % _version)
